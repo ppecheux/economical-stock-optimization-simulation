@@ -20,20 +20,36 @@ on doit déterminer la proportion de produit à se débarasser chaque semaine
 
 class Stock:
     '''représente l'état du stock sur les semaines'''
-    nbInvendus
+
 
     def __init__(self,serviceCible,s1,s2,s3):
         self.sc=serviceCible
-        self.s1=s1
-        self.s2=s2
-        self.s3=s3
+        self.semaines=[s1,s2,s3]
+        self.nbNonSatifait = 0
 
     def stockTotal(self):
-        somme=self.s1+self.s2+self.s3
+        somme=0
+        for i in self.semaines:
+            somme+=i
         return somme
 
     def nouvelleSemaine(self,demande):
         #On cherche à répondre à la demande
+        #On considère que chaque client achete un produit
+
+        for i in self.semaines:
+            
+            if i>demande :
+                i-=demande
+                demande=0
+            else:
+                demande-=i
+                i=0
+            print(i)
+
+        if demande>0 :
+            self.nbNonSatifait+=demande
+
 
         #ON décale les semaines
 
@@ -44,7 +60,9 @@ class Stock:
         print("mon stock total actuel est de \n")
         print(self.stockTotal())
 
-monStock=Stock(2,3,4)
+monStock=Stock(1,1,1,1)
 print("hey")
-print(monStock.s1)
+print(monStock.semaines[0])
+monStock.printStock()
+monStock.nouvelleSemaine(2)
 monStock.printStock()
