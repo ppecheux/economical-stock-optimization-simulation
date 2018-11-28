@@ -1,4 +1,4 @@
-# coding: utf-8 on top of the file.
+# coding: utf-8 
 
 """
 
@@ -25,6 +25,7 @@ class Stock:
     def __init__(self,serviceCible,s1,s2,s3):
         self.sc=serviceCible
         self.semaines=[s1,s2,s3]
+        self.dechet=0#on aurait pu mettre comme une semaine suplémentaire...
         self.nbNonSatifait = 0
 
     def stockTotal(self):
@@ -54,6 +55,7 @@ class Stock:
         self.semaines=temp
 
         #ON décale les semaines
+        self.dechet=self.semaines[len(self.semaines)-1]
         for i in range (0, len(self.semaines) - 1):
             self.semaines[len(self.semaines)-i-1]=self.semaines[len(self.semaines)-i-2]
         
@@ -71,3 +73,8 @@ monStock.printStock()
 monStock.nouvelleSemaine(2)
 monStock.printStock()
 print(monStock.semaines[0])
+
+#TODO
+#generer un tableau de valeur suivant une loi normale
+#utiliser la fonction demande n fois
+#faire varier l'approcisionnement pour voir le moment ou le service cible est atteint
