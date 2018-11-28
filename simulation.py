@@ -36,7 +36,7 @@ class Stock:
     def nouvelleSemaine(self,demande):
         #On cherche à répondre à la demande
         #On considère que chaque client achete un produit
-
+        temp=[]
         for i in self.semaines:
             
             if i>demande :
@@ -46,15 +46,19 @@ class Stock:
                 demande-=i
                 i=0
             print(i)
+            temp.append(i)
 
         if demande>0 :
             self.nbNonSatifait+=demande
 
+        self.semaines=temp
 
         #ON décale les semaines
-
+        for i in range (0, len(self.semaines) - 1):
+            self.semaines[len(self.semaines)-i-1]=self.semaines[len(self.semaines)-i-2]
+        
         #On initialise la nouvelle semaine
-
+        self.semaines[0]=0#TODO
     
     def printStock(self):
         print("mon stock total actuel est de \n")
@@ -66,3 +70,4 @@ print(monStock.semaines[0])
 monStock.printStock()
 monStock.nouvelleSemaine(2)
 monStock.printStock()
+print(monStock.semaines[0])
