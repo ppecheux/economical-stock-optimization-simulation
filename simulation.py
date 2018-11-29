@@ -104,12 +104,8 @@ def simulerTabStockCible(nbSemaines,tabStockCible):
     return(tabServiceDechet)
 
 
-tabStockCible=[150,155,160]
-tabStockCible=np.arange(0,200,10)
+tabStockCible=np.arange(0,300,1)
 tab =simulerTabStockCible(100,tabStockCible)
-
-
-print(tab)
 plt.plot(tabStockCible,tab,'ro')
 plt.show()
 
