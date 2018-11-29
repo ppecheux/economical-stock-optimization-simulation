@@ -80,10 +80,9 @@ mu, sigma = 155, 38.9 # demande moyenne et equart type de la demande moyenne
 
 #plt.show()
 
-#TODO
 #generer un tableau de valeur suivant une loi normale : s = np.random.normal(mu, sigma, 100000)
 #pour l'histogramme: count, bins, ignored = plt.hist(s, 30, normed=True)
-#utiliser la fonction demande n fois
+
 
 def simulerSemainesStockCible(nbSemaines,stockCible):
     monStock=Stock(1,stockCible,stockCible,stockCible,stockCible)
@@ -95,7 +94,7 @@ def simulerSemainesStockCible(nbSemaines,stockCible):
         #print(monStock.nbNonSatifait)
     
     serviceCibleReel =1- monStock.nbNonSatifait/np.sum(demandes)
-    conclusions = [serviceCibleReel,monStock.dechet]
+    conclusions = serviceCibleReel
     return conclusions
 
 def simulerTabStockCible(nbSemaines,tabStockCible):
@@ -104,8 +103,15 @@ def simulerTabStockCible(nbSemaines,tabStockCible):
         tabServiceDechet.append( simulerSemainesStockCible(nbSemaines,i))
     return(tabServiceDechet)
 
-tab =simulerTabStockCible(100,[150,155,160])
+
+tabStockCible=[150,155,160]
+tabStockCible=np.arange(0,200,10)
+tab =simulerTabStockCible(100,tabStockCible)
+
+
 print(tab)
+plt.plot(tabStockCible,tab,'ro')
+plt.show()
 
 
 #print(serviceCibleReel)
