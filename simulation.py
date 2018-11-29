@@ -61,7 +61,7 @@ class Stock:
         self.semaines=temp
 
         #ON décale les semaines
-        self.dechet=self.semaines[len(self.semaines)-1]
+        self.dechet+=self.semaines[len(self.semaines)-1]
         for i in range (0, len(self.semaines) - 1):
             self.semaines[len(self.semaines)-i-1]=self.semaines[len(self.semaines)-i-2]
         
@@ -69,11 +69,11 @@ class Stock:
         self.semaines[0]=self.stockCible#TODO
     
     def printStock(self):
-        print("mon stock total actuel est de \n")
+        print("\nmon stock total actuel est de ")
         print(self.stockTotal())
 
+mu, sigma = 155, 38.9 # demande moyenne et equart type de la demande moyenne
 
-monStock=Stock(1,2,0,0,0)
 '''
 print(monStock.semaines[0])
 monStock.printStock()
@@ -82,7 +82,7 @@ monStock.printStock()
 print(monStock.semaines[0])
 '''
 
-mu, sigma = 10, 0.1 # mean and standard deviation
+
 
 s = np.random.normal(mu, sigma, 10)
 count, bins, ignored = plt.hist(s, 30, normed=True)
@@ -95,10 +95,23 @@ count, bins, ignored = plt.hist(s, 30, normed=True)
 #generer un tableau de valeur suivant une loi normale : s = np.random.normal(mu, sigma, 100000)
 #utiliser la fonction demande n fois
 
-demandes = [0,0,0,0,3]
-for i in demandes:
-    monStock.nouvelleSemaine(i)
-    monStock.printStock()
+def simulerSemainesStockCible(nbSemaines,stockCible):
+    monStock=Stock(1,stockCible,stockCible,stockCible,stockCible)
+    demandes = np.random.normal(mu, sigma, nbSemaines)
+    for i in demandes:
+        monStock.nouvelleSemaine(i)
+        #monStock.printStock()
+        #print(monStock.dechet)
+        #print(monStock.nbNonSatifait)
+    
+    serviceCibleReel =1- monStock.nbNonSatifait/np.sum(demandes)
+    conclusions = [serviceCibleReel,monStock.dechet]
+    return conclusions
+
+tab = simulerSemainesStockCible(100,155)
+print(tab)
+
+#print(serviceCibleReel)
 
 
 
