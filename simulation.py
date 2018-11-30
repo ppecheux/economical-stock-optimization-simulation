@@ -30,6 +30,7 @@ class Stock:
         self.dechet=0#on aurait pu mettre comme une semaine suplémentaire...
         self.nbNonSatifait = 0
         self.stockCible = stockCible
+        self.fournis= self.stockTotal()
 
     def stockTotal(self):
         somme=0
@@ -66,22 +67,14 @@ class Stock:
             self.semaines[len(self.semaines)-i-1]=self.semaines[len(self.semaines)-i-2]
         
         #On initialise la nouvelle semaine
-        self.semaines[0]=self.stockCible-self.stockTotal()#TODO
+        self.semaines[0]=self.stockCible-self.stockTotal()#TODO #c'est bon
+        self.fournis+=self.semaines[0]
     
     def printStock(self):
         print("\nmon stock total actuel est de ")
         print(self.stockTotal())
 
 mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
-
-
-
-#plt.plot(bins, 1/(sigma * np.sqrt(2 * np.pi)) * np.exp( - (bins - mu)**2 / (2 * sigma**2) ),linewidth=2, color='r')
-
-#plt.show()
-
-#generer un tableau de valeur suivant une loi normale : s = np.random.normal(mu, sigma, 100000)
-#pour l'histogramme: count, bins, ignored = plt.hist(s, 30, normed=True)
 
 
 def simulerSemainesStockCible(nbSemaines,stockCible):
@@ -101,7 +94,7 @@ def dechetsSemainesStockCible(nbSemaines,stockCible):
     for i in demandes:
         monStock.nouvelleSemaine(i)
     
-    dechet =monStock.dechet/np.sum(demandes)#TODO
+    dechet =monStock.dechet/monStock.fournis#TODO
     return dechet
 
 def simulerTabStockCible(nbSemaines,tabStockCible):
@@ -118,7 +111,7 @@ def dechetTabStockCible(nbSemaines,tabStockCible):
 
 tabStockCible=np.arange(0,500,1)
 tab =simulerTabStockCible(100,tabStockCible)
-dechets = dechetTabStockCible(100,tabStockCible)#TODO faire un plot de ce tableau
+dechets = dechetTabStockCible(100,tabStockCible)
 
 #plt.yscale("log")
 plt.ylabel("Service Reel Simule")
