@@ -24,9 +24,9 @@ class Stock:
     '''représente l'état du stock sur les semaines'''
 
 
-    def __init__(self,serviceCible,stockCible,s1,s2,s3):
+    def __init__(self,serviceCible,stockCible,ListeSemainesDeStock):
         self.sc=serviceCible
-        self.semaines=[s1,s2,s3]
+        self.semaines=ListeSemainesDeStock
         self.dechet=0#on aurait pu mettre comme une semaine suplémentaire...
         self.nbNonSatifait = 0
         self.stockCible = stockCible
@@ -75,10 +75,12 @@ class Stock:
         print(self.stockTotal())
 
 mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
+nbSemPermention = 3
+ListeSemainesDeStock = np.zeros(nbSemPermention)
 
 
 def simulerSemainesStockCible(nbSemaines,stockCible):
-    monStock=Stock(1,stockCible,stockCible,stockCible,stockCible)
+    monStock=Stock(1,stockCible,ListeSemainesDeStock)
     demandes = np.random.normal(mu, sigma, nbSemaines)
     for i in demandes:
         monStock.nouvelleSemaine(i)
@@ -89,13 +91,13 @@ def simulerSemainesStockCible(nbSemaines,stockCible):
     return conclusions
 
 def dechetsSemainesStockCible(nbSemaines,stockCible):
-    monStock=Stock(1,stockCible,stockCible,stockCible,stockCible)
+    monStock=Stock(1,stockCible,ListeSemainesDeStock)
     demandes = np.random.normal(mu, sigma, nbSemaines)
     for i in demandes:
         monStock.nouvelleSemaine(i)
     
-    dechet =monStock.dechet/monStock.fournis#TODO
-    return dechet
+    dechet =monStock.dechet/monStock.fournis
+    return dechet#semble trop faible
 
 def simulerTabStockCible(nbSemaines,tabStockCible):
     tabService = []
@@ -109,9 +111,9 @@ def dechetTabStockCible(nbSemaines,tabStockCible):
         tabDechet.append( dechetsSemainesStockCible(nbSemaines,i))
     return(tabDechet)
 
-tabStockCible=np.arange(0,500,1)
-tab =simulerTabStockCible(100,tabStockCible)
-dechets = dechetTabStockCible(100,tabStockCible)
+tabStockCible=np.arange(0,5000,1000)
+tab =simulerTabStockCible(100000,tabStockCible)
+dechets = dechetTabStockCible(100000,tabStockCible)
 
 #plt.yscale("log")
 plt.ylabel("Service Reel Simule")
@@ -125,8 +127,3 @@ plt.show()
 
 
 #print(serviceCibleReel)
-
-
-
-
-#faire varier l'approcisionnement pour voir le moment ou le service cible est atteint
