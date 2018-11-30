@@ -110,19 +110,30 @@ def dechetsSemainesStockCible(nbSemaines,stockCible):
     return dechet
 
 def simulerTabStockCible(nbSemaines,tabStockCible):
-    tabServiceDechet = []
+    tabService = []
     for i in tabStockCible:
-        tabServiceDechet.append( simulerSemainesStockCible(nbSemaines,i))
-    return(tabServiceDechet)
+        tabService.append( simulerSemainesStockCible(nbSemaines,i))
+    return(tabService)
 
+def dechetTabStockCible(nbSemaines,tabStockCible):
+    tabDechet = []
+    for i in tabStockCible:
+        tabDechet.append( dechetsSemainesStockCible(nbSemaines,i))
+    return(tabDechet)
 
-tabStockCible=np.arange(0,300,1)
+tabStockCible=np.arange(0,400,1)
 tab =simulerTabStockCible(100,tabStockCible)
+dechets = dechetTabStockCible(100,tabStockCible)#TODO faire un plot de ce tableau
+
 #plt.yscale("log")
 plt.ylabel("Service Reel Simule")
 plt.xlabel("Stock Cible")
 plt.plot(tabStockCible,tab,'ro')
+
+
+#plt.plot(tabStockCible,dechets)
 plt.show()
+#print(dechetsSemainesStockCible(100,200))
 
 
 #print(serviceCibleReel)
