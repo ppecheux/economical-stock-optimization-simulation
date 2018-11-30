@@ -29,14 +29,16 @@ class Stock:
         self.fournis= float(self.stockTotal())
 
     def stockTotal(self):
-        somme=0
-        for i in self.semaines:
-            somme+=i
-        return somme
+        return np.sum(self.semaines)
 
     def nouvelleSemaine(self,demande):
         #On cherche à répondre à la demande
         #On considère qu'on doit livrer qu'un seul client
+        if self.semaines[len(self.semaines)-1]-demande >0:
+            self.dechet+=self.semaines[len(self.semaines)-1]-demande
+        
+        self.semaines,demande = tabProduitMoinsDemande(self.semaines,demande)
+        '''
         temp=[]
         for i in self.semaines:
             
@@ -48,16 +50,15 @@ class Stock:
                 i=0
 
             temp.append(i)
-
+'''
         if demande>0 :
             self.nbNonSatifait+= 1
 
-        self.semaines=temp
+#        self.semaines=temp
 
         #ON décale les semaines
-        self.dechet+=self.semaines[len(self.semaines)-1]
-        for i in range (0, len(self.semaines) - 1):
-            self.semaines[len(self.semaines)-i-1]=self.semaines[len(self.semaines)-i-2]
+        #self.dechet+=self.semaines[len(self.semaines)-1]
+        decalCaseTab(self.semaines)
         
         #On initialise la nouvelle semaine
         self.semaines[0]=self.stockCible-self.stockTotal()#TODO #c'est bon
@@ -68,11 +69,31 @@ class Stock:
         print(self.stockTotal())
 
 
-nbSemPermenption = 3
+nbSemPermenption = 10
 ListeSemainesDeStock = np.zeros(nbSemPermenption)
 
 
+def decalCaseTab(tab):
+    #retoune le tableau avec les valeurs décallées mais avec la premiere case <- derniere nouvelle case
+    for i in range (len(tab)):
+        tab[len(tab)-1-i]=tab[len(tab)-2-i]
+    return tab
 
+def tabProduitMoinsDemande(tab,demande):
+    for i in range (len(tab)-1):
+        if tab[len(tab)-1-i]>demande:
+            tab[len(tab)-1-i]-=demande
+            demande=0
+        else:
+            demande-=tab[len(tab)-1-i]
+            tab[len(tab)-1-i]=0
+
+    return tab,demande
+
+tab,demande=np.arange(0,3,1),100
+tab,demande=tabProduitMoinsDemande(tab,demande)
+print(tab)
+print(demande)
 
 
 def simulerSemainesStockCible(nbSemaines,stockCible,demandes):
@@ -97,12 +118,12 @@ def dechetsSemainesStockCible(nbSemaines,stockCible,demandes):
     try:
         tauxDechet = float(monStock.dechet)/monStock.fournis
     except:
-        return -1
+        return 0.0
 
-    print([tauxDechet,monStock.dechet,monStock.fournis,monStock.stockTotal()])
+    print([tauxDechet,monStock.dechet,monStock.semaines[len(monStock.semaines)-1],monStock.fournis,monStock.stockTotal()])
     return tauxDechet#semble trop faible
 
-#dechetsSemainesStockCible(10,155)
+
 
 def simulerTabStockCible(nbSemaines,tabStockCible,mesDemandes):
     tabService = []
@@ -116,14 +137,13 @@ def dechetTabStockCible(nbSemaines,tabStockCible,mesDemandes):
         tabDechet.append( dechetsSemainesStockCible(nbSemaines,i,mesDemandes))
     return(tabDechet)
 
-#dechetTabStockCible(10,[3,2],[1550,0])
 
 def simulationPousse():
 
-    tabStockCible=np.arange(0,500,10)
+    tabStockCible=np.arange(1,500,10)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-    nbsemaine=10000
+    nbsemaine=1000
     mesDemandes = np.random.normal(mu, sigma, nbsemaine)
 
     tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
@@ -139,8 +159,25 @@ def simulationPousse():
 
 simulationPousse()
 
+def simulationFacile():
+    tabStockCible=np.arange(0,20,0.1)
+
+    nbsemaine=10
+    mesDemandes = np.arange(0,10,1)
+
+    tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
+    dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
+
+    plt.ylabel("Service Reel Simule")
+    plt.xlabel("Stock Cible")
+    plt.plot(tabStockCible,tabServiceSimule,'ro')
+    plt.plot(tabStockCible,dechets)
+    print(tabServiceSimule)
+    print(dechets)
+    plt.show()
 
 
+#simulationFacile()
 
 #print(dechetsSemainesStockCible(100,200))
 
