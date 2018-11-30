@@ -72,7 +72,7 @@ class Stock:
         print("\nmon stock total actuel est de ")
         print(self.stockTotal())
 
-mu, sigma = 155, 38.9 # demande moyenne et equart type de la demande moyenne
+mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
 
 
@@ -89,9 +89,7 @@ def simulerSemainesStockCible(nbSemaines,stockCible):
     demandes = np.random.normal(mu, sigma, nbSemaines)
     for i in demandes:
         monStock.nouvelleSemaine(i)
-        #monStock.printStock()
-        #print(monStock.dechet)
-        #print(monStock.nbNonSatifait)
+
     
     serviceCibleReel =1- monStock.nbNonSatifait/np.sum(demandes)
     conclusions = serviceCibleReel
@@ -102,11 +100,8 @@ def dechetsSemainesStockCible(nbSemaines,stockCible):
     demandes = np.random.normal(mu, sigma, nbSemaines)
     for i in demandes:
         monStock.nouvelleSemaine(i)
-        #monStock.printStock()
-        #print(monStock.dechet)
-        #print(monStock.nbNonSatifait)
     
-    dechet =monStock.dechet
+    dechet =monStock.dechet/np.sum(demandes)#TODO
     return dechet
 
 def simulerTabStockCible(nbSemaines,tabStockCible):
@@ -121,7 +116,7 @@ def dechetTabStockCible(nbSemaines,tabStockCible):
         tabDechet.append( dechetsSemainesStockCible(nbSemaines,i))
     return(tabDechet)
 
-tabStockCible=np.arange(0,400,1)
+tabStockCible=np.arange(0,500,1)
 tab =simulerTabStockCible(100,tabStockCible)
 dechets = dechetTabStockCible(100,tabStockCible)#TODO faire un plot de ce tableau
 
@@ -131,7 +126,7 @@ plt.xlabel("Stock Cible")
 plt.plot(tabStockCible,tab,'ro')
 
 
-#plt.plot(tabStockCible,dechets)
+plt.plot(tabStockCible,dechets)
 plt.show()
 #print(dechetsSemainesStockCible(100,200))
 
