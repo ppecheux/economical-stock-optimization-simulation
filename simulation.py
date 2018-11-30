@@ -66,7 +66,7 @@ class Stock:
             self.semaines[len(self.semaines)-i-1]=self.semaines[len(self.semaines)-i-2]
         
         #On initialise la nouvelle semaine
-        self.semaines[0]=self.stockCible#TODO
+        self.semaines[0]=self.stockCible-self.stockTotal()#TODO
     
     def printStock(self):
         print("\nmon stock total actuel est de ")
@@ -97,6 +97,18 @@ def simulerSemainesStockCible(nbSemaines,stockCible):
     conclusions = serviceCibleReel
     return conclusions
 
+def dechetsSemainesStockCible(nbSemaines,stockCible):
+    monStock=Stock(1,stockCible,stockCible,stockCible,stockCible)
+    demandes = np.random.normal(mu, sigma, nbSemaines)
+    for i in demandes:
+        monStock.nouvelleSemaine(i)
+        #monStock.printStock()
+        #print(monStock.dechet)
+        #print(monStock.nbNonSatifait)
+    
+    dechet =monStock.dechet
+    return dechet
+
 def simulerTabStockCible(nbSemaines,tabStockCible):
     tabServiceDechet = []
     for i in tabStockCible:
@@ -106,6 +118,9 @@ def simulerTabStockCible(nbSemaines,tabStockCible):
 
 tabStockCible=np.arange(0,300,1)
 tab =simulerTabStockCible(100,tabStockCible)
+#plt.yscale("log")
+plt.ylabel("Service Reel Simule")
+plt.xlabel("Stock Cible")
 plt.plot(tabStockCible,tab,'ro')
 plt.show()
 
