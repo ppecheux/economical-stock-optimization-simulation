@@ -57,7 +57,7 @@ class Stock:
             temp.append(i)
 
         if demande>0 :
-            self.nbNonSatifait+=demande
+            self.nbNonSatifait+= 1
 
         self.semaines=temp
 
@@ -75,28 +75,33 @@ class Stock:
         print(self.stockTotal())
 
 mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
-nbSemPermention = 3
-ListeSemainesDeStock = np.zeros(nbSemPermention)
+nbSemPermenption = 3
+ListeSemainesDeStock = np.zeros(nbSemPermenption)
+
 
 
 def simulerSemainesStockCible(nbSemaines,stockCible):
+    ListeSemainesDeStock[0]=stockCible
     monStock=Stock(1,stockCible,ListeSemainesDeStock)
     demandes = np.random.normal(mu, sigma, nbSemaines)
+
     for i in demandes:
         monStock.nouvelleSemaine(i)
 
-    
-    serviceCibleReel =1- monStock.nbNonSatifait/np.sum(demandes)
-    conclusions = serviceCibleReel
-    return conclusions
+    print(nbsemaine)
+    print(monStock.nbNonSatifait)
+    serviceCibleReel = 1 - (float(monStock.nbNonSatifait)/nbSemaines)
+    print(serviceCibleReel)
+    return serviceCibleReel
 
 def dechetsSemainesStockCible(nbSemaines,stockCible):
+    ListeSemainesDeStock[0]=stockCible
     monStock=Stock(1,stockCible,ListeSemainesDeStock)
     demandes = np.random.normal(mu, sigma, nbSemaines)
     for i in demandes:
         monStock.nouvelleSemaine(i)
     
-    dechet =monStock.dechet/monStock.fournis
+    dechet = monStock.dechet/monStock.fournis
     return dechet#semble trop faible
 
 def simulerTabStockCible(nbSemaines,tabStockCible):
@@ -111,17 +116,22 @@ def dechetTabStockCible(nbSemaines,tabStockCible):
         tabDechet.append( dechetsSemainesStockCible(nbSemaines,i))
     return(tabDechet)
 
-tabStockCible=np.arange(0,5000,1000)
-tab =simulerTabStockCible(100000,tabStockCible)
-dechets = dechetTabStockCible(100000,tabStockCible)
+tabStockCible=np.arange(0,500,10)
+nbsemaine=100
+tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible)
+dechets = dechetTabStockCible(nbsemaine,tabStockCible)
 
-#plt.yscale("log")
 plt.ylabel("Service Reel Simule")
 plt.xlabel("Stock Cible")
-plt.plot(tabStockCible,tab,'ro')
+plt.plot(tabStockCible,tabServiceSimule,'ro')
 
 
 plt.plot(tabStockCible,dechets)
+print(tabServiceSimule)
+print(dechets)
+
+
+
 plt.show()
 #print(dechetsSemainesStockCible(100,200))
 
