@@ -28,7 +28,7 @@ class Stock:
         self.nbNonSatifait = 0.0
         self.produitNonLivre=0
         self.stockCible = float(stockCible)
-        self.fournis= float(self.stockTotal())
+        self.fournis= stockCible
 
     def stockTotal(self):
         return np.sum(self.semaines)
@@ -44,7 +44,7 @@ class Stock:
             self.produitNonLivre+=demande
 
         #ON décale les semaines
-        self.dechet+=1.0*self.semaines[len(self.semaines)-1]
+        self.dechet+=self.semaines[len(self.semaines)-1]
         decalCaseTab(self.semaines)
         
         #On initialise la nouvelle semaine
@@ -57,7 +57,13 @@ class Stock:
         print("etatDuStock=",self.semaines)
         print("stockFournis=",self.fournis)
         print("stockDechet=",self.dechet)
+        print("tauxDechet=",self.tauxDechet())
         print("PersonnesNOnsatisfaites=",self.nbNonSatifait)
+
+    def tauxDechet(self):
+        if self.fournis>1 :
+            return (self.dechet/self.fournis)
+        return 0
 
 
 
@@ -101,7 +107,7 @@ def testChangementSemaine():
         monStock.nouvelleSemaine(demande)
         #monStock.printStock()
 
-#testChangementSemaine()
+testChangementSemaine()
 def simulerSemainesStockCible(nbSemaines,stockCible,demandes):
     ListeSemainesDeStock[0]=stockCible
     monStock=Stock(1,stockCible,ListeSemainesDeStock)
@@ -119,15 +125,9 @@ def dechetsSemainesStockCible(nbSemaines,stockCible,demandes):
 
     for i in demandes:
         monStock.nouvelleSemaine(i)
-    
-    tauxDechet=0.0
-    try:
-        tauxDechet = float(monStock.dechet)/monStock.fournis
-    except:
-        return 0.0
 
-    print([tauxDechet,monStock.dechet,monStock.semaines[len(monStock.semaines)-1],monStock.fournis,monStock.stockTotal()])
-    return tauxDechet#semble trop faible
+    #print([tauxDechet,monStock.dechet,monStock.semaines[len(monStock.semaines)-1],monStock.fournis,monStock.stockTotal()])
+    return monStock.tauxDechet()#semble trop faible
 
 
 
@@ -146,10 +146,10 @@ def dechetTabStockCible(nbSemaines,tabStockCible,mesDemandes):
 
 def simulationPousse():
 
-    tabStockCible=np.arange(1,500,10)
+    tabStockCible=np.arange(0,400,10)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-    nbsemaine=1000
+    nbsemaine=100
     mesDemandes = np.random.normal(mu, sigma, nbsemaine)
 
     tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
