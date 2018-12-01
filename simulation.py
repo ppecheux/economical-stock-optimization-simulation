@@ -15,6 +15,7 @@ alpha = étant fixé
 """
 import numpy as np
 import matplotlib.pyplot as plt
+#import GestionDeTab
 
 class Stock:
     '''représente l'état du stock sur les semaines'''
@@ -25,6 +26,7 @@ class Stock:
         self.semaines=ListeSemainesDeStock#liste de stock
         self.dechet=0.0#on aurait pu mettre comme une semaine suplémentaire...
         self.nbNonSatifait = 0.0
+        self.produitNonLivre=0
         self.stockCible = float(stockCible)
         self.fournis= float(self.stockTotal())
 
@@ -34,43 +36,34 @@ class Stock:
     def nouvelleSemaine(self,demande):
         #On cherche à répondre à la demande
         #On considère qu'on doit livrer qu'un seul client
-        if self.semaines[len(self.semaines)-1]-demande >0:
-            self.dechet+=self.semaines[len(self.semaines)-1]-demande
         
         self.semaines,demande = tabProduitMoinsDemande(self.semaines,demande)
-        '''
-        temp=[]
-        for i in self.semaines:
-            
-            if i>demande :
-                i-=demande
-                demande=0
-            else:
-                demande-=i
-                i=0
 
-            temp.append(i)
-'''
         if demande>0 :
-            self.nbNonSatifait+= 1
-
-#        self.semaines=temp
+            self.nbNonSatifait+= 1.0
+            self.produitNonLivre+=demande
 
         #ON décale les semaines
-        #self.dechet+=self.semaines[len(self.semaines)-1]
+        self.dechet+=1.0*self.semaines[len(self.semaines)-1]
         decalCaseTab(self.semaines)
         
         #On initialise la nouvelle semaine
-        self.semaines[0]=self.stockCible-self.stockTotal()#TODO #c'est bon
+        self.semaines[0]=0.0
+        self.semaines[0]=1.0*(self.stockCible-self.stockTotal())
         self.fournis+=self.semaines[0]
     
     def printStock(self):
-        print("\nmon stock total actuel est de ")
-        print(self.stockTotal())
+        print("stockTotal=",self.stockTotal())
+        print("etatDuStock=",self.semaines)
+        print("stockFournis=",self.fournis)
+        print("stockDechet=",self.dechet)
+        print("PersonnesNOnsatisfaites=",self.nbNonSatifait)
 
 
-nbSemPermenption = 10
+
+nbSemPermenption = 3
 ListeSemainesDeStock = np.zeros(nbSemPermenption)
+
 
 
 def decalCaseTab(tab):
@@ -90,12 +83,25 @@ def tabProduitMoinsDemande(tab,demande):
 
     return tab,demande
 
-tab,demande=np.arange(0,3,1),100
-tab,demande=tabProduitMoinsDemande(tab,demande)
-print(tab)
-print(demande)
+def testtabProduitMoinsDemande():
+    tab,demande=np.arange(0,3,1),100
+    tab,demande=tabProduitMoinsDemande(tab,demande)
+    print(tab)
+    print(demande)
 
+#testtabProduitMoinsDemande()
 
+def testChangementSemaine():
+    stockCible = 3
+    demande=0
+    ListeSemainesDeStock = np.arange(0,3,1)
+    monStock=Stock(1,stockCible,ListeSemainesDeStock)
+    for i in np.zeros(10):
+        monStock.printStock()
+        monStock.nouvelleSemaine(demande)
+        #monStock.printStock()
+
+#testChangementSemaine()
 def simulerSemainesStockCible(nbSemaines,stockCible,demandes):
     ListeSemainesDeStock[0]=stockCible
     monStock=Stock(1,stockCible,ListeSemainesDeStock)
@@ -103,7 +109,7 @@ def simulerSemainesStockCible(nbSemaines,stockCible,demandes):
     for i in demandes:
         monStock.nouvelleSemaine(i)
 
-    serviceCibleReel = float(1 - (float(monStock.nbNonSatifait)/nbSemaines))
+    serviceCibleReel = 1 - (float(monStock.nbNonSatifait)/float(nbSemaines))
    
     return serviceCibleReel
 
@@ -175,7 +181,6 @@ def simulationFacile():
     print(tabServiceSimule)
     print(dechets)
     plt.show()
-
 
 #simulationFacile()
 
