@@ -1,7 +1,5 @@
 # coding: utf-8 
-
 """
-
 On s’intéresse au stock de produits P1, le plus vendu.
 On considère que la demande hebdomadaire de produits 
 P1 peut être modélisée par une loi Normale N(155,38.9)
@@ -19,7 +17,6 @@ import matplotlib.pyplot as plt
 
 class Stock:
     '''représente l'état du stock sur les semaines'''
-
 
     def __init__(self,serviceCible,stockCible,ListeSemainesDeStock):
         self.sc=float(serviceCible)#proportion de clients servis
@@ -139,18 +136,15 @@ def simulerTabStockCible(nbSemaines,tabStockCible,mesDemandes):
     return(tabService)
 
 def dechetTabStockCible(nbSemaines,tabStockCible,mesDemandes):
-    tabDechet = []
-    for i in tabStockCible:
-        tabDechet.append( dechetsSemainesStockCible(nbSemaines,i,mesDemandes))
-    return(tabDechet)
-
+    return [dechetsSemainesStockCible(nbSemaines,i,mesDemandes) for i in tabStockCible]
+    
 
 def simulationPousse():
 
-    tabStockCible=np.arange(155,300,1.0)
+    tabStockCible=np.arange(155,300,1)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-    nbsemaine=100
+    nbsemaine=1000
     mesDemandes = np.random.normal(mu, sigma, nbsemaine)
     mesDemandes[mesDemandes<0]=0
 
@@ -165,7 +159,7 @@ def simulationPousse():
     #print(dechets)
     plt.show()
 
-simulationPousse()
+#simulationPousse()
 
 def simulationFacile():
     tabStockCible=np.arange(0,20,0.1)
@@ -191,7 +185,7 @@ def distributionTauxDechet(stockCible):
     tabStockCible=[stockCible]*1000
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-    nbsemaine=10
+    nbsemaine=1000
     mesDemandes = np.random.normal(mu, sigma, nbsemaine)
     mesDemandes[mesDemandes<0]=0
     dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)

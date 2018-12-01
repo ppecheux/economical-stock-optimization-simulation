@@ -2,7 +2,7 @@
 
 
 import numpy as np
-
+import matplotlib.pyplot as plt
 def decalCaseTab(tab):
     #retoune le tableau avec les valeurs décallées mais avec la premiere case <- derniere nouvelle case
     for i in range (len(tab)):
@@ -26,5 +26,10 @@ def testtabProduitMoinsDemande():
     print(tab)
     print(demande)
 
-tab = [5]*5
-print(tab)
+
+mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
+
+nbsemaine=1000
+mesDemandes = np.random.normal(mu, sigma, nbsemaine)
+plt.hist(mesDemandes)
+plt.show()
