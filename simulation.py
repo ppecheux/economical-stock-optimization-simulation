@@ -26,7 +26,7 @@ class Stock:
         self.semaines=ListeSemainesDeStock#liste de stock
         self.dechet=0.0#on aurait pu mettre comme une semaine suplémentaire...
         self.nbNonSatifait = 0.0
-        self.produitNonLivre=0
+        self.produitNonLivre=0.0
         self.stockCible = float(stockCible)
         self.fournis= stockCible
 
@@ -61,9 +61,9 @@ class Stock:
         print("PersonnesNOnsatisfaites=",self.nbNonSatifait)
 
     def tauxDechet(self):
-        if self.fournis>1 :
-            return (self.dechet/self.fournis)
-        return 0
+        if self.fournis>1.0 :
+            return (self.dechet/float(self.fournis))
+        return 0.0
 
 
 
@@ -107,7 +107,8 @@ def testChangementSemaine():
         monStock.nouvelleSemaine(demande)
         #monStock.printStock()
 
-testChangementSemaine()
+#testChangementSemaine()
+
 def simulerSemainesStockCible(nbSemaines,stockCible,demandes):
     ListeSemainesDeStock[0]=stockCible
     monStock=Stock(1,stockCible,ListeSemainesDeStock)
@@ -146,11 +147,12 @@ def dechetTabStockCible(nbSemaines,tabStockCible,mesDemandes):
 
 def simulationPousse():
 
-    tabStockCible=np.arange(0,400,10)
+    tabStockCible=np.arange(155,300,1.0)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
     nbsemaine=100
     mesDemandes = np.random.normal(mu, sigma, nbsemaine)
+    mesDemandes[mesDemandes<0]=0
 
     tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
     dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
@@ -159,8 +161,8 @@ def simulationPousse():
     plt.xlabel("Stock Cible")
     plt.plot(tabStockCible,tabServiceSimule,'ro')
     plt.plot(tabStockCible,dechets)
-    print(tabServiceSimule)
-    print(dechets)
+    #print(tabServiceSimule)
+    #print(dechets)
     plt.show()
 
 simulationPousse()
@@ -178,13 +180,23 @@ def simulationFacile():
     plt.xlabel("Stock Cible")
     plt.plot(tabStockCible,tabServiceSimule,'ro')
     plt.plot(tabStockCible,dechets)
-    print(tabServiceSimule)
-    print(dechets)
+    #print(tabServiceSimule)
+    #print(dechets)
     plt.show()
 
 #simulationFacile()
 
-#print(dechetsSemainesStockCible(100,200))
+def distributionTauxDechet(stockCible):
 
+    tabStockCible=[stockCible]*1000
+    mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-#print(serviceCibleReel)
+    nbsemaine=10
+    mesDemandes = np.random.normal(mu, sigma, nbsemaine)
+    mesDemandes[mesDemandes<0]=0
+    dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
+    dechets[0]=dechets[1]
+    plt.hist(dechets)
+    plt.show()
+
+distributionTauxDechet(1500)

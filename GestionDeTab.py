@@ -26,3 +26,5 @@ def testtabProduitMoinsDemande():
     print(tab)
     print(demande)
 
+tab = [5]*5
+print(tab)
