@@ -21,15 +21,20 @@ def tabProduitMoinsDemande(tab,demande):
     return tab,demande
 
 def testtabProduitMoinsDemande():
-    tab,demande=np.arange(0,3,1),100
+    tab,demande=np.arange(0.0,2.0,1),0.2
     tab,demande=tabProduitMoinsDemande(tab,demande)
     print(tab)
     print(demande)
 
+#def approvisonnement()
 
+testtabProduitMoinsDemande()
+
+'''
 mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
 nbsemaine=1000
 mesDemandes = np.random.normal(mu, sigma, nbsemaine)
 plt.hist(mesDemandes)
 plt.show()
+'''

@@ -26,6 +26,7 @@ class Stock:
         self.produitNonLivre=0.0
         self.stockCible = float(stockCible)
         self.fournis= stockCible
+        self.age=0
 
     def stockTotal(self):
         return np.sum(self.semaines)
@@ -33,10 +34,11 @@ class Stock:
     def nouvelleSemaine(self,demande):
         #On cherche à répondre à la demande
         #On considère qu'on doit livrer qu'un seul client
+        self.age+=1
         
         self.semaines,demande = tabProduitMoinsDemande(self.semaines,demande)
 
-        if demande>0 :
+        if np.floor(demande)>0.1 :
             self.nbNonSatifait+= 1.0
             self.produitNonLivre+=demande
 
@@ -46,10 +48,12 @@ class Stock:
         
         #On initialise la nouvelle semaine
         self.semaines[0]=0.0
-        self.semaines[0]=1.0*(self.stockCible-self.stockTotal())
+        reste=self.stockTotal()
+        self.semaines[0]=1.0*(self.stockCible-reste)
         self.fournis+=self.semaines[0]
     
     def printStock(self):
+        print("age=",self.age)
         print("stockTotal=",self.stockTotal())
         print("etatDuStock=",self.semaines)
         print("stockFournis=",self.fournis)
@@ -64,7 +68,7 @@ class Stock:
 
 
 
-nbSemPermenption = 3
+nbSemPermenption = 2
 ListeSemainesDeStock = np.zeros(nbSemPermenption)
 
 
@@ -123,6 +127,7 @@ def dechetsSemainesStockCible(nbSemaines,stockCible,demandes):
 
     for i in demandes:
         monStock.nouvelleSemaine(i)
+        monStock.printStock()
 
     #print([tauxDechet,monStock.dechet,monStock.semaines[len(monStock.semaines)-1],monStock.fournis,monStock.stockTotal()])
     return monStock.tauxDechet()#semble trop faible
@@ -141,7 +146,7 @@ def dechetTabStockCible(nbSemaines,tabStockCible,mesDemandes):
 
 def simulationPousse():
 
-    tabStockCible=np.arange(155,300,1)
+    tabStockCible=np.arange(155,1000,10)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
     nbsemaine=1000
@@ -162,10 +167,10 @@ def simulationPousse():
 #simulationPousse()
 
 def simulationFacile():
-    tabStockCible=np.arange(0,20,0.1)
+    tabStockCible=np.ones(3)
 
     nbsemaine=10
-    mesDemandes = np.arange(0,10,1)
+    mesDemandes = np.ones(3)
 
     tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
     dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
@@ -174,18 +179,18 @@ def simulationFacile():
     plt.xlabel("Stock Cible")
     plt.plot(tabStockCible,tabServiceSimule,'ro')
     plt.plot(tabStockCible,dechets)
-    #print(tabServiceSimule)
-    #print(dechets)
+    print(tabServiceSimule)
+    print(dechets)
     plt.show()
 
-#simulationFacile()
+simulationFacile()
 
 def distributionTauxDechet(stockCible):
 
     tabStockCible=[stockCible]*1000
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-    nbsemaine=1000
+    nbsemaine=100
     mesDemandes = np.random.normal(mu, sigma, nbsemaine)
     mesDemandes[mesDemandes<0]=0
     dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
@@ -193,4 +198,4 @@ def distributionTauxDechet(stockCible):
     plt.hist(dechets)
     plt.show()
 
-distributionTauxDechet(1500)
+#distributionTauxDechet(1500)
