@@ -27,6 +27,9 @@ class Stock:
         self.stockCible = float(stockCible)
         self.fournis= stockCible
         self.age=0
+    
+    def profit(self):
+        return (self.fournis-self.dechet)*100-self.fournis*97
 
     def stockTotal(self):
         return np.sum(self.semaines)
@@ -48,8 +51,7 @@ class Stock:
         
         #On initialise la nouvelle semaine
         self.semaines[0]=0.0
-        reste=self.stockTotal()
-        self.semaines[0]=1.0*(self.stockCible-reste)
+        self.semaines[0]=1.0*(self.stockCible-self.stockTotal())
         self.fournis+=self.semaines[0]
     
     def printStock(self):
@@ -68,7 +70,7 @@ class Stock:
 
 
 
-nbSemPermenption = 1
+nbSemPermenption = 3
 ListeSemainesDeStock = np.zeros(nbSemPermenption)
 
 
@@ -127,11 +129,10 @@ def dechetsSemainesStockCible(nbSemaines,stockCible,demandes):
 
     for i in demandes:
         monStock.nouvelleSemaine(i)
-        monStock.printStock()
+        #monStock.printStock()
 
     #print([tauxDechet,monStock.dechet,monStock.semaines[len(monStock.semaines)-1],monStock.fournis,monStock.stockTotal()])
     return monStock.tauxDechet()#semble trop faible
-
 
 
 def simulerTabStockCible(nbSemaines,tabStockCible,mesDemandes):
@@ -143,10 +144,20 @@ def simulerTabStockCible(nbSemaines,tabStockCible,mesDemandes):
 def dechetTabStockCible(nbSemaines,tabStockCible,mesDemandes):
     return [dechetsSemainesStockCible(nbSemaines,i,mesDemandes) for i in tabStockCible]
     
+def profitTabStockCible(nbSemaines,tabStockCible,mesDemandes):
+    tabProfit=[]
+    for s in tabStockCible:
+        monStock=Stock(1,s,ListeSemainesDeStock)
+        for i in mesDemandes:
+            monStock.nouvelleSemaine(i)
+        tabProfit.append(monStock.profit())
+    
+    return tabProfit
+
 
 def simulationPousse():
 
-    tabStockCible=np.arange(155,1000,10)
+    tabStockCible=np.arange(0,350,10)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
     nbsemaine=1000
@@ -155,35 +166,43 @@ def simulationPousse():
 
     tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
     dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
+    profits = profitTabStockCible(nbsemaine,tabStockCible,mesDemandes)
 
     plt.ylabel("Service Reel Simule")
     plt.xlabel("Stock Cible")
     plt.plot(tabStockCible,tabServiceSimule,'ro')
+
     plt.plot(tabStockCible,dechets)
     #print(tabServiceSimule)
     #print(dechets)
+    #plt.show()
+
+    plt.plot(tabStockCible,profits/np.amax(profits),'go')
     plt.show()
 
-#simulationPousse()
+simulationPousse()
 
 def simulationFacile():
-    tabStockCible=np.ones(1)
+    tabStockCible=np.arange(0,10,1)
 
     nbsemaine=10
     mesDemandes = np.ones(10)
 
     tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
     dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
-
+    profits = profitTabStockCible(nbsemaine,tabStockCible,mesDemandes)
     plt.ylabel("Service Reel Simule")
     plt.xlabel("Stock Cible")
+
     plt.plot(tabStockCible,tabServiceSimule,'ro')
     plt.plot(tabStockCible,dechets)
-    print(tabServiceSimule)
-    print(dechets)
+    #print(tabServiceSimule)
+    #print(dechets)
+    plt.show()
+    plt.plot(tabStockCible,profits,'go')
     plt.show()
 
-simulationFacile()
+#simulationFacile()
 
 def distributionTauxDechet(stockCible):
 
