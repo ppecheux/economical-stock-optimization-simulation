@@ -10,7 +10,7 @@ def decalCaseTab(tab):
     return tab
 
 def tabProduitMoinsDemande(tab,demande):
-    for i in range (len(tab)-1):
+    for i in range (len(tab)):
         if tab[len(tab)-1-i]>demande:
             tab[len(tab)-1-i]-=demande
             demande=0
@@ -21,7 +21,8 @@ def tabProduitMoinsDemande(tab,demande):
     return tab,demande
 
 def testtabProduitMoinsDemande():
-    tab,demande=np.arange(0.0,2.0,1),0.2
+    tab,demande=np.arange(0.0,2.0,1),10
+    tab=np.ones(10)
     tab,demande=tabProduitMoinsDemande(tab,demande)
     print(tab)
     print(demande)

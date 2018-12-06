@@ -68,7 +68,7 @@ class Stock:
 
 
 
-nbSemPermenption = 2
+nbSemPermenption = 1
 ListeSemainesDeStock = np.zeros(nbSemPermenption)
 
 
@@ -80,7 +80,7 @@ def decalCaseTab(tab):
     return tab
 
 def tabProduitMoinsDemande(tab,demande):
-    for i in range (len(tab)-1):
+    for i in range (len(tab)):
         if tab[len(tab)-1-i]>demande:
             tab[len(tab)-1-i]-=demande
             demande=0
@@ -167,10 +167,10 @@ def simulationPousse():
 #simulationPousse()
 
 def simulationFacile():
-    tabStockCible=np.ones(3)
+    tabStockCible=np.ones(1)
 
     nbsemaine=10
-    mesDemandes = np.ones(3)
+    mesDemandes = np.ones(10)
 
     tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
     dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
