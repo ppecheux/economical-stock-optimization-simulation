@@ -29,7 +29,20 @@ def testtabProduitMoinsDemande():
 
 #def approvisonnement()
 
-testtabProduitMoinsDemande()
+#testtabProduitMoinsDemande()
+
+def prixToDemandeMoyenne(prix):
+    '''Prix=17719*volume**-0.579'''
+    a=17719
+    p=-0.579
+    volume=(prix/a)**(-1/0.579)#on a le volume par an
+    #donc on divise par 52 pour l'avoir en semaine
+    return volume/52
+
+print(prixToDemandeMoyenne(100))
+
+print(52*7)
+
 
 '''
 mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne

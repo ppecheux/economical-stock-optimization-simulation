@@ -10,6 +10,16 @@ demande ~ N(155,60)
 P(-U(1-a/2)<demande-155)/(60/sqrt(n))< U(1-a/2))=1-a
 
 alpha = étant fixé
+
+elasticité= prix/volume voir sur wikipedia
+volume en fonction du stock cible
+c'est la fonction qui lie l e prix au volume
+
+on a calculé que Prix=17719*volume**-0.579
+
+prix variable
+
+dp/p / dp/v
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -70,7 +80,7 @@ class Stock:
 
 
 
-nbSemPermenption = 3
+nbSemPermenption = 4
 ListeSemainesDeStock = np.zeros(nbSemPermenption)
 
 
@@ -218,3 +228,11 @@ def distributionTauxDechet(stockCible):
     plt.show()
 
 #distributionTauxDechet(1500)
+
+def prixToDemandeMoyenne(prix):
+    '''Prix=17719*volume**-0.579'''
+    a=17719
+    p=-0.579
+    volume=(prix/a)**(-1/0.579)#on a le volume par an
+    #donc on divise par 52 pour l'avoir en semaine
+    return volume/52
