@@ -25,16 +25,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 #import GestionDeTab
 
+def prixToDemandeMoyenne(prix):
+    '''Prix=17719*volume**-0.579'''
+    a=17719
+    p=-0.579
+    volume=(prix/a)**(-1/0.579)#on a le volume par an
+    #donc on divise par 52 pour l'avoir en semaine
+    return volume/52
+
 class Stock:
     '''représente l'état du stock sur les semaines'''
 
     def __init__(self,serviceCible,stockCible,ListeSemainesDeStock):
         self.sc=float(serviceCible)#proportion de clients servis
+
         self.semaines=ListeSemainesDeStock#liste de stock
         self.dechet=0.0#on aurait pu mettre comme une semaine suplémentaire...
+
         self.nbNonSatifait = 0.0
         self.produitNonLivre=0.0
         self.stockCible = float(stockCible)
+        self.prixInit = 100
+
         self.fournis= stockCible
         self.age=0
     
@@ -64,6 +76,29 @@ class Stock:
         self.semaines[0]=1.0*(self.stockCible-self.stockTotal())
         self.fournis+=self.semaines[0]
     
+
+    def nouvelleSemainePrix(self):
+        self.age+=1
+
+        #generation d'une demande aléatoire en adéquation au prix du produit
+        demande = np.random.normal(prixToDemandeMoyenne(self.prixInit), 60, 1)
+        demande[demande<0]=0
+
+        self.semaines,demande = tabProduitMoinsDemande(self.semaines,demande[0])
+        if(np.floor(demande)>0):
+            self.nbNonSatifait+=1
+            self.produitNonLivre+=demande
+
+        #ON décale les semaines
+        self.dechet+=self.semaines[len(self.semaines)-1]
+        decalCaseTab(self.semaines)
+        
+        #On initialise la nouvelle semaine
+        self.semaines[0]=0.0
+        self.semaines[0]=1.0*(self.stockCible-self.stockTotal())
+        self.fournis+=self.semaines[0]
+
+
     def printStock(self):
         print("age=",self.age)
         print("stockTotal=",self.stockTotal())
@@ -127,7 +162,7 @@ def simulerSemainesStockCible(nbSemaines,stockCible,demandes):
     monStock=Stock(1,stockCible,ListeSemainesDeStock)
 
     for i in demandes:
-        monStock.nouvelleSemaine(i)
+        monStock.nouvelleSemainePrix()
 
     serviceCibleReel = 1 - (float(monStock.nbNonSatifait)/float(nbSemaines))
    
@@ -170,7 +205,7 @@ def simulationPousse():
     tabStockCible=np.arange(0,350,10)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-    nbsemaine=1000
+    nbsemaine=100000
     mesDemandes = np.random.normal(mu, sigma, nbsemaine)
     mesDemandes[mesDemandes<0]=0
 
@@ -229,10 +264,3 @@ def distributionTauxDechet(stockCible):
 
 #distributionTauxDechet(1500)
 
-def prixToDemandeMoyenne(prix):
-    '''Prix=17719*volume**-0.579'''
-    a=17719
-    p=-0.579
-    volume=(prix/a)**(-1/0.579)#on a le volume par an
-    #donc on divise par 52 pour l'avoir en semaine
-    return volume/52
