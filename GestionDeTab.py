@@ -39,9 +39,18 @@ def prixToDemandeMoyenne(prix):
     #donc on divise par 52 pour l'avoir en semaine
     return volume/52
 
-print(prixToDemandeMoyenne(100))
+#print(prixToDemandeMoyenne(100))#test de fonction
 
-print(52*7)
+def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit,dernierRabet=0,PremierRabet=0):
+    #on veut simuler l'achat des articles selon leur prix dans le tableau
+
+    if len(tabStock)>1 and dernierRabet>0:#le gens vont commencer à acheter plus 
+        #tant qu'il y a des produits moins chers
+        demande = np.normal(prixToDemandeMoyenne(prixInit*(1-dernierRabet)))
+        
+        return 
+
+
 
 
 '''
