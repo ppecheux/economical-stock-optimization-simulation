@@ -42,8 +42,8 @@ def prixToDemandeMoyenne(prix):
     return volume/52
 
 #print(prixToDemandeMoyenne(100))#test de fonction
-def tabApresRabetDemandeEtProduitRestant(tabStock,demande):
-    stockIniDernier=tabStock[len(tabStock)-1]
+def tabApresRabetDemandeRestante(tabStock,demande):
+
     if tabStock[len(tabStock)-1]>demande:
         #l'offre répond à toute la demande
         tabStock[len(tabStock-1)]-=demande
@@ -53,14 +53,17 @@ def tabApresRabetDemandeEtProduitRestant(tabStock,demande):
         demande-=tabStock[len(tabStock)-1]
         tabStock[len(tabStock)-1]=0
 
-    nbVendu=stockIniDernier-tabStock[len(tabStock)-1]
-    return tabStock,demande,nbVendu
+
+    return tabStock,demande
 
 def testTabRabet():
-    tabStock,demande,nbVendu=tabApresRabetDemandeEtProduitRestant(np.ones(10),4)
+    arr=np.ones(3)
+
+    tabStock,demande=tabApresRabetDemandeRestante(arr[:-1],4)
+    tabStock=np.append(tabStock,[0])
     print(tabStock)
     print(demande)
-    print(nbVendu)#on valide la fonction
+    #on valide la fonction
 
 testTabRabet()
 
@@ -68,35 +71,43 @@ testTabRabet()
 def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit,dernierRabet=0,premierRabet=0):
     #on veut simuler l'achat des articles selon leur prix dans le tableau
     stockIniDernier=tabStock[len(tabStock-1)]
+    caDernier=0
+    nbVendu=0
 
-    if len(tabStock)>1 and dernierRabet>0:#le gens vont commencer à acheter plus 
+    if dernierRabet>0:#le gens vont commencer à acheter plus 
         #tant qu'il y a des produits moins chers
         prixDernier=prixInit*(1-dernierRabet)
+
         demande = np.normal(prixToDemandeMoyenne(prixDernier,sigma))
-        if tabStock[len(tabStock-1)]>demande:
-            tabStock[len(tabStock-1)]-=demande
-            caDernier=prixDernier*(stockIniDernier-tabStock[len(tabStock-1)])
+        tabStock,demande=tabApresRabetDemandeRestante(tabStock,demande)
+        nbVendu=stockIniDernier-tabStock[len(tabStock-1)]
+        caDernier=prixDernier*nbVendu
+        if demande == 0:
             return tabStock,caDernier
 
-        else:
-            demande-=tabStock[len(tabStock-1)]
-            tabStock[len(tabStock-1)]=0
     
     if len(tabStock)>2 and premierRabet>0:#le gens vont commencer à acheter plus 
         #tant qu'il y a des produits moins chers
-        prixDernier=prixInit*(1-dernierRabet)
-        demande = np.normal(prixToDemandeMoyenne(prixDernier,sigma))
-        if tabStock[len(tabStock-1)]>demande:
-            tabStock[len(tabStock-1)]-=demande
-            caDernier=prixDernier*(stockIniDernier-tabStock[len(tabStock-1)])
-            return tabStock,caDernier
+        prixADernier=prixInit*(1-premierRabet)
+        #on genere la demande en retirant la demande satisfaite par le premier stock
+        demande = np.normal(prixToDemandeMoyenne(prixADernier,sigma))-nbVendu
+        if demande>0:
+            stockIniADernier=tabStock[len(tabStock)-2]
+            tabStock,demande=tabApresRabetDemandeRestante(tabStock[:-1],demande) #on considère le sous stock
+            tabStock=np.append(tabStock,[0])
+            nbVendu=stockIniADernier-tabStock[len(tabStock)-2]
 
-        else:
-            demande-=tabStock[len(tabStock-1)]
-            tabStock[len(tabStock-1)]=0       
-
-        return 
-
+            if demande == 0:
+                return tabStock,caDernier
+    
+    #finalement les autres semaines sont achetées
+    if np.sum(tabStock)>0:
+        demande=np.normal(prixToDemandeMoyenne(prixInit,sigma))-nbVendu
+        tabStock,demande = tabProduitMoinsDemande(tabStock,demande)
+    else:
+        print (tabProduitMoinsDemandeEtCADerniereSemaine)
+        exit('Failure')
+    return tabStock,caDernier
 
 
 
