@@ -3,6 +3,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+sigma=60
+
 def decalCaseTab(tab):
     #retoune le tableau avec les valeurs décallées mais avec la premiere case <- derniere nouvelle case
     for i in range (len(tab)):
@@ -40,14 +42,59 @@ def prixToDemandeMoyenne(prix):
     return volume/52
 
 #print(prixToDemandeMoyenne(100))#test de fonction
+def tabApresRabetDemandeEtProduitRestant(tabStock,demande):
+    stockIniDernier=tabStock[len(tabStock)-1]
+    if tabStock[len(tabStock)-1]>demande:
+        #l'offre répond à toute la demande
+        tabStock[len(tabStock-1)]-=demande
+        demande=0
 
-def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit,dernierRabet=0,PremierRabet=0):
+    else:
+        demande-=tabStock[len(tabStock)-1]
+        tabStock[len(tabStock)-1]=0
+
+    nbVendu=stockIniDernier-tabStock[len(tabStock)-1]
+    return tabStock,demande,nbVendu
+
+def testTabRabet():
+    tabStock,demande,nbVendu=tabApresRabetDemandeEtProduitRestant(np.ones(10),4)
+    print(tabStock)
+    print(demande)
+    print(nbVendu)#on valide la fonction
+
+testTabRabet()
+
+
+def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit,dernierRabet=0,premierRabet=0):
     #on veut simuler l'achat des articles selon leur prix dans le tableau
+    stockIniDernier=tabStock[len(tabStock-1)]
 
     if len(tabStock)>1 and dernierRabet>0:#le gens vont commencer à acheter plus 
         #tant qu'il y a des produits moins chers
-        demande = np.normal(prixToDemandeMoyenne(prixInit*(1-dernierRabet)))
-        
+        prixDernier=prixInit*(1-dernierRabet)
+        demande = np.normal(prixToDemandeMoyenne(prixDernier,sigma))
+        if tabStock[len(tabStock-1)]>demande:
+            tabStock[len(tabStock-1)]-=demande
+            caDernier=prixDernier*(stockIniDernier-tabStock[len(tabStock-1)])
+            return tabStock,caDernier
+
+        else:
+            demande-=tabStock[len(tabStock-1)]
+            tabStock[len(tabStock-1)]=0
+    
+    if len(tabStock)>2 and premierRabet>0:#le gens vont commencer à acheter plus 
+        #tant qu'il y a des produits moins chers
+        prixDernier=prixInit*(1-dernierRabet)
+        demande = np.normal(prixToDemandeMoyenne(prixDernier,sigma))
+        if tabStock[len(tabStock-1)]>demande:
+            tabStock[len(tabStock-1)]-=demande
+            caDernier=prixDernier*(stockIniDernier-tabStock[len(tabStock-1)])
+            return tabStock,caDernier
+
+        else:
+            demande-=tabStock[len(tabStock-1)]
+            tabStock[len(tabStock-1)]=0       
+
         return 
 
 
