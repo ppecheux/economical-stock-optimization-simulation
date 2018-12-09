@@ -203,12 +203,12 @@ def profitTabStockCible(nbSemaines,tabStockCible,mesDemandes):
 
 def simulationPousse():
 
-    tabStockCible=np.arange(0,500,30)
+    tabStockCible=np.arange(0,3000,100)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
     nbsemaine=500
-    mesDemandes = np.random.normal(mu, sigma, nbsemaine)
-    mesDemandes[mesDemandes<0]=0
+    mesDemandes = np.zeros(nbsemaine)#np.random.normal(mu, sigma, nbsemaine)
+    #mesDemandes[mesDemandes<0]=0
 
     tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
     dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
@@ -221,12 +221,12 @@ def simulationPousse():
     plt.plot(tabStockCible,dechets)
     #print(tabServiceSimule)
     #print(dechets)
-    #plt.show()
-
-    plt.plot(tabStockCible,profits/np.amax(profits),'go')
     plt.show()
 
-simulationPousse()
+    #plt.plot(tabStockCible,profits/np.amax(profits),'go')
+    #plt.show()
+
+#simulationPousse()
 
 def simulationFacile():
     tabStockCible=np.arange(0,10,1)
@@ -255,12 +255,12 @@ def distributionTauxDechet(stockCible):
     tabStockCible=[stockCible]*1000
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-    nbsemaine=100
-    mesDemandes = np.random.normal(mu, sigma, nbsemaine)
+    nbsemaine=1000
+    mesDemandes = np.zeros(nbsemaine)#np.random.normal(mu, sigma, nbsemaine)
     dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
     dechets[0]=dechets[1]
     plt.hist(dechets)
     plt.show()
 
-distributionTauxDechet(1500)
+distributionTauxDechet(200)
 
