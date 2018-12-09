@@ -81,10 +81,11 @@ class Stock:
         self.age+=1
 
         #generation d'une demande aléatoire en adéquation au prix du produit
-        demande = np.random.normal(prixToDemandeMoyenne(self.prixInit), 60, 1)
-        demande[demande<0]=0
+        demande = np.random.normal(prixToDemandeMoyenne(self.prixInit), 60)
+        if demande<0:
+            demande=0
 
-        self.semaines,demande = tabProduitMoinsDemande(self.semaines,demande[0])
+        self.semaines,demande = tabProduitMoinsDemande(self.semaines,demande)
         if(np.floor(demande)>0):
             self.nbNonSatifait+=1
             self.produitNonLivre+=demande
@@ -173,7 +174,7 @@ def dechetsSemainesStockCible(nbSemaines,stockCible,demandes):
     monStock=Stock(1,stockCible,ListeSemainesDeStock)
 
     for i in demandes:
-        monStock.nouvelleSemaine(i)
+        monStock.nouvelleSemainePrix()
         #monStock.printStock()
 
     #print([tauxDechet,monStock.dechet,monStock.semaines[len(monStock.semaines)-1],monStock.fournis,monStock.stockTotal()])
@@ -202,10 +203,10 @@ def profitTabStockCible(nbSemaines,tabStockCible,mesDemandes):
 
 def simulationPousse():
 
-    tabStockCible=np.arange(0,350,10)
+    tabStockCible=np.arange(0,500,30)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-    nbsemaine=100000
+    nbsemaine=500
     mesDemandes = np.random.normal(mu, sigma, nbsemaine)
     mesDemandes[mesDemandes<0]=0
 
@@ -256,11 +257,10 @@ def distributionTauxDechet(stockCible):
 
     nbsemaine=100
     mesDemandes = np.random.normal(mu, sigma, nbsemaine)
-    mesDemandes[mesDemandes<0]=0
     dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
     dechets[0]=dechets[1]
     plt.hist(dechets)
     plt.show()
 
-#distributionTauxDechet(1500)
+distributionTauxDechet(1500)
 
