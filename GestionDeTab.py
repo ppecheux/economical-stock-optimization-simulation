@@ -3,7 +3,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-sigma=60
+sigma=1
 
 def decalCaseTab(tab):
     #retoune le tableau avec les valeurs décallées mais avec la premiere case <- derniere nouvelle case
@@ -53,7 +53,7 @@ def tabApresRabetDemandeRestante(tabStock,demande):
         demande-=tabStock[len(tabStock)-1]
         tabStock[len(tabStock)-1]=0
 
-    print(tabStock)
+    print("tabApresRabetDemandeRestante:",tabStock)
     print(demande)
     return tabStock,demande
 
@@ -101,15 +101,18 @@ def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit,dernierRabet=0,p
             stockIniADernier=tabStock[len(tabStock)-2]
             tabStock,demande=tabApresRabetDemandeRestante(tabStock[:-1],demande) #on considère le sous stock
             tabStock=np.append(tabStock,[0])
-            nbVendu=stockIniADernier-tabStock[len(tabStock)-2]
+            nbVendu+=stockIniADernier-tabStock[len(tabStock)-2]
 
             if demande == 0:
                 return tabStock,demande,caDernier
     
     #finalement les autres semaines sont achetées
     if np.sum(tabStock)>0:
+        print("nbvendu=",nbVendu)
         demande=np.random.normal(prixToDemandeMoyenne(prixInit),sigma)-nbVendu
         demande=max(0,demande)
+        print(tabStock)
+        print(demande)
         tabStock,demande = tabProduitMoinsDemande(tabStock,demande)
     else:
         print (tabProduitMoinsDemandeEtCADerniereSemaine)
@@ -117,9 +120,19 @@ def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit,dernierRabet=0,p
     return tabStock,demande,caDernier
 
 def testProdDemCADer():
-    tab=np.ones(5)
-    prixInit=400
+
+    tab=np.array([100,100,100,100])
+    prixInit=50
+    rabet=0.1
+    rabet2=0.05
+    '''sans rabet
     tab,demande,cad=tabProduitMoinsDemandeEtCADerniereSemaine(tab,prixInit)
+'''
+    '''avec un premier rabet
+    tab,demande,cad=tabProduitMoinsDemandeEtCADerniereSemaine(tab,prixInit,dernierRabet=rabet)
+    '''
+
+    tab,demande,cad=tabProduitMoinsDemandeEtCADerniereSemaine(tab,prixInit,dernierRabet=rabet,premierRabet=rabet2)
     print(tab)
     print(demande)
     print(cad)
