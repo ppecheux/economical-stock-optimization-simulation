@@ -92,9 +92,7 @@ def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit,dRabet=0,aDrabet
         demande=np.random.normal(prixToDemandeMoyenne(prixInit),sigma)-nbVendu
         demande=max(0,demande)
         tabStock,demande = tabProduitMoinsDemande(tabStock,demande)
-    else:
-        print ('tabProduitMoinsDemandeEtCADerniereSemaine')
-        #exit('Failure')
+
     return tabStock,demande,caDernier
 
 class Stock:
@@ -118,7 +116,10 @@ class Stock:
         self.aDrabet=aDrabet
 
         self.caDeLaDerniereSemaine=0
-    
+
+    def chiffreAff(self):
+        return (self.fournis-self.dechet)*100
+
     def profit(self):
         return (self.fournis-self.dechet)*100-self.fournis*97
 
@@ -308,7 +309,7 @@ def simulationPousse():
     plt.plot(tabStockCible,profits/np.amax(profits),'yo',label='taux de profit')
     plt.show()
 
-simulationPousse()
+#simulationPousse()
 
 def simulationFacile():
     tabStockCible=np.arange(0,10,1)
@@ -346,3 +347,11 @@ def distributionTauxDechet(stockCible):
 
 #distributionTauxDechet(245)
 
+def tauxCAD(stockCible=245,ADrabet=0,Drabet=0,nbSemaine=100):
+    stockIni=np.zeros(nbSemPermenption)
+    monStock=Stock(1,stockCible,stockIni,dRabet=Drabet)
+    for s in range(nbSemaine):
+        monStock.nouvelleSemaineRabets()
+    return monStock.caDeLaDerniereSemaine/monStock.chiffreAff()
+
+print(tauxCAD())
