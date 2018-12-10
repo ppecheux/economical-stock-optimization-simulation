@@ -48,8 +48,6 @@ def tabApresRabetDemandeRestante(tabStock,demande):
         demande-=tabStock[len(tabStock)-1]
         tabStock[len(tabStock)-1]=0
 
-    print("tabApresRabetDemandeRestante:",tabStock)
-    print(demande)
     return tabStock,demande
 
 def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit,dRabet=0,aDrabet=0):
@@ -64,8 +62,7 @@ def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit,dRabet=0,aDrabet
 
     demande = np.random.normal(prixToDemandeMoyenne(prixDernier),sigma)
     demande=max(0,demande)
-    print(tabStock)
-    print(demande)
+
     tabStock,demande=tabApresRabetDemandeRestante(tabStock,demande)
 
     nbVendu=stockIniDernier-tabStock[len(tabStock)-1]
@@ -91,11 +88,9 @@ def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit,dRabet=0,aDrabet
     
     #finalement les autres semaines sont achetées
     if np.sum(tabStock)>0:
-        print("nbvendu=",nbVendu)
+        #print("nbvendu=",nbVendu)
         demande=np.random.normal(prixToDemandeMoyenne(prixInit),sigma)-nbVendu
         demande=max(0,demande)
-        print(tabStock)
-        print(demande)
         tabStock,demande = tabProduitMoinsDemande(tabStock,demande)
     else:
         print ('tabProduitMoinsDemandeEtCADerniereSemaine')
