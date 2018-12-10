@@ -115,8 +115,8 @@ def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit,dernierRabet=0,p
         print(demande)
         tabStock,demande = tabProduitMoinsDemande(tabStock,demande)
     else:
-        print (tabProduitMoinsDemandeEtCADerniereSemaine)
-        exit('Failure')
+        print ('tabProduitMoinsDemandeEtCADerniereSemaine')
+        #exit('Failure')
     return tabStock,demande,caDernier
 
 def testProdDemCADer():
@@ -137,7 +137,7 @@ def testProdDemCADer():
     print(demande)
     print(cad)
 
-testProdDemCADer()
+#testProdDemCADer()
 
 '''
 mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
