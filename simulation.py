@@ -47,6 +47,7 @@ class Stock:
         self.stockCible = float(stockCible)
 
         self.prixInit = 100
+        self.mu=prixToDemandeMoyenne(self.prixInit)
         self.age=0
 
         self.dernierRabet=0.2 #le pourcent de rabet sur le dernier produit
@@ -85,15 +86,17 @@ class Stock:
         self.age+=1
 
         #generation d'une demande aléatoire en adéquation au prix du produit
-        demande = max(0,np.random.normal(prixToDemandeMoyenne(self.prixInit), 60))
+        demande = max(0,np.random.normal(self.mu, 60))
 
         self.semaines,demande = tabProduitMoinsDemande(self.semaines,demande)
-        if(np.floor(demande)>0):
+        if(demande>0):
             self.nbNonSatifait+=1
             self.produitNonLivre+=demande
+        else:
+            self.dechet+=self.semaines[len(self.semaines)-1]
 
         #ON décale les semaines
-        self.dechet+=self.semaines[len(self.semaines)-1]
+
         decalCaseTab(self.semaines)
         
         #On initialise la nouvelle semaine
@@ -112,13 +115,13 @@ class Stock:
         print("PersonnesNOnsatisfaites=",self.nbNonSatifait)
 
     def tauxDechet(self):
-        if self.fournis>1.0 :
-            return (self.dechet/float(self.fournis))
+        if self.fournis>1.0 and self.age>0 :
+            return (self.dechet/float(self.fournis))#(prixToDemandeMoyenne(self.prixInit)*self.age))#demander au prof de vérifier
         return 0.0
 
 
 
-nbSemPermenption = 3
+nbSemPermenption = 2
 ListeSemainesDeStock = np.zeros(nbSemPermenption)
 
 
@@ -149,13 +152,14 @@ def testtabProduitMoinsDemande():
 #testtabProduitMoinsDemande()
 
 def testChangementSemaine():
-    stockCible = 3
+    stockCible = 600
     demande=0
-    ListeSemainesDeStock = np.arange(0,3,1)
+    ListeSemainesDeStock = np.array([100,0,0])
     monStock=Stock(1,stockCible,ListeSemainesDeStock)
     for i in np.zeros(10):
         monStock.printStock()
-        monStock.nouvelleSemaine(demande)
+        #monStock.nouvelleSemaine(demande)
+        monStock.nouvelleSemainePrix()
         #monStock.printStock()
 
 #testChangementSemaine()
@@ -203,10 +207,10 @@ def profitTabStockCible(nbSemaines,tabStockCible,mesDemandes):
 
 def simulationPousse():
 
-    tabStockCible=np.arange(155,300,20)
+    tabStockCible=np.arange(0,300,50)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-    nbsemaine=1000
+    nbsemaine=100
     mesDemandes = np.zeros(nbsemaine)#np.random.normal(mu, sigma, nbsemaine)
     #mesDemandes[mesDemandes<0]=0
 
@@ -216,12 +220,12 @@ def simulationPousse():
 
     plt.ylabel("Service Reel Simule")
     plt.xlabel("Stock Cible")
-    plt.plot(tabStockCible,tabServiceSimule,'c',label='taux de ServiceCible')
+    plt.plot(tabStockCible,tabServiceSimule,'co',label='taux de ServiceCible')
 
     plt.plot(tabStockCible,dechets,'k',label='taux de Déchet')
     #print(tabServiceSimule)
     #print(dechets)
-    #plt.show()
+    plt.show()
 
     plt.plot(tabStockCible,profits/np.amax(profits),'yo',label='taux de profit')
     plt.show()
@@ -255,12 +259,12 @@ def distributionTauxDechet(stockCible):
     tabStockCible=[stockCible]*1000
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-    nbsemaine=100
+    nbsemaine=1000
     mesDemandes = np.zeros(nbsemaine)#np.random.normal(mu, sigma, nbsemaine)
     dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
     dechets[0]=dechets[1]
     plt.hist(dechets)
     plt.show()
 
-#distributionTauxDechet(240)
+distributionTauxDechet(245)
 

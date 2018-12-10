@@ -127,7 +127,7 @@ def testProdDemCADer():
     rabet2=0.05
     '''sans rabet
     tab,demande,cad=tabProduitMoinsDemandeEtCADerniereSemaine(tab,prixInit)
-'''
+    '''
     '''avec un premier rabet
     tab,demande,cad=tabProduitMoinsDemandeEtCADerniereSemaine(tab,prixInit,dernierRabet=rabet)
     '''
