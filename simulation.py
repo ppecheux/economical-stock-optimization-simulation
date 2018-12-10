@@ -85,9 +85,7 @@ class Stock:
         self.age+=1
 
         #generation d'une demande aléatoire en adéquation au prix du produit
-        demande = np.random.normal(prixToDemandeMoyenne(self.prixInit), 60)
-        if demande<0:
-            demande=0
+        demande = max(0,np.random.normal(prixToDemandeMoyenne(self.prixInit), 60))
 
         self.semaines,demande = tabProduitMoinsDemande(self.semaines,demande)
         if(np.floor(demande)>0):
