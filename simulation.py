@@ -355,10 +355,27 @@ def tauxCAD(stockCible=245,ADrabet=0,Drabet=0,nbSemaine=100,nbSemPermenption=4):
 
 def tauxCADperemption(stockCible=245,ADrabet=0,Drabet=0,nbSemaine=100):
     taux = np.array([])
-    for i in range(1,5,1):
-        t=tauxCAD(stockCible=245,ADrabet=0,Drabet=0,nbSemaine=10000,nbSemPermenption=i)
+    ageRejetMax=6
+    tabSemaineMax=np.arange(2,ageRejetMax,1)
+    for i in tabSemaineMax:
+        t=tauxCAD(stockCible=245,ADrabet=0,Drabet=0,nbSemaine=1000,nbSemPermenption=i)
         print(t)
-        np.append(taux,t)
+        taux=np.append(taux,[t])
+
+    plt.ylabel("Part de CA de la derniere semaine")
+    plt.xlabel("Nombre de semaine avant le rejet")
+    plt.plot(tabSemaineMax,taux)
+    #plt.show()
     return taux
 
-print(tauxCADperemption())
+def tauxCADperemptionRabet(pas=0):
+    #Fonction qui montre un tableau qui fait varier la semaine de peremption
+    #le taux de rabet avec le pas et donne le taux de CAD de la dernière semaine
+    tauxCADperemption()
+    if(pas!=0):
+        r=np.arange(pas,1,pas)
+        for i in r:
+            tauxCADperemption(Drabet=i)
+    plt.show()
+
+tauxCADperemptionRabet(pas=0.2)
