@@ -101,6 +101,7 @@ class Stock:
     def __init__(self,serviceCible,stockCible,ListeSemainesDeStock,prixInit=97,dRabet=0,aDrabet=0):
         self.semaines=ListeSemainesDeStock#liste de stock
         self.dechet=0.0#on aurait pu mettre comme une semaine suplémentaire...
+        self.volumeSemaine=np.zeros(len(ListeSemainesDeStock))#fait le cumul des produit vendu par semaine dans le stock
 
         self.nbNonSatifait = 0.0
         self.produitNonLivre=0.0
@@ -171,8 +172,10 @@ class Stock:
 
     def nouvelleSemaineRabets(self):
         self.age+=1
-
+        tempSemaines=np.zeros(len(self.semaines))
+        tempSemaines[:]=self.semaines
         self.semaines,demande,caDsem = tabProduitMoinsDemandeEtCADerniereSemaine(self.semaines,self.prixInit,self.dRabet,self.aDrabet)
+        self.volumeSemaine=self.volumeSemaine+(tempSemaines-self.semaines)
         self.caDeLaDerniereSemaine+=caDsem
         if(demande>0):
             self.nbNonSatifait+=1
@@ -193,6 +196,7 @@ class Stock:
         print("age=",self.age)
         print("stockTotal=",self.stockTotal())
         print("etatDuStock=",self.semaines)
+        print("vendus cumulé semaine stock=",self.volumeSemaine)
         print("stockFournis=",self.fournis)
         print("stockDechet=",self.dechet)
         print("tauxDechet=",self.tauxDechet())
@@ -235,10 +239,11 @@ def testChangementSemaine():
     for i in np.zeros(10):
         monStock.printStock()
         #monStock.nouvelleSemaine(demande)
-        monStock.nouvelleSemainePrix()
+        #monStock.nouvelleSemainePrix()
+        monStock.nouvelleSemaineRabets()
         #monStock.printStock()
 
-#testChangementSemaine()
+testChangementSemaine()
 
 def simulerSemainesStockCible(nbSemaines,stockCible,demandes):
     ListeSemainesDeStock[0]=stockCible
@@ -378,4 +383,17 @@ def tauxCADperemptionRabet(pas=0):
             tauxCADperemption(Drabet=i)
     plt.show()
 
-tauxCADperemptionRabet(pas=0.2)
+#tauxCADperemptionRabet(pas=0.2)
+
+def profitRabet(stockCible=133,ADrabet=0,Drabet=0,nbSemaine=100,nbSemPermenption=4):
+    semaineStock=np.zeros(nbSemPermenption)
+    tabprofit=np.array([])
+    tabDrabet=np.arange(0,1,0.1)
+    for r in tabDrabet:
+        monStock=Stock(1,stockCible,semaineStock,dRabet=Drabet)
+        for s in range(nbSemaine):
+            monStock.nouvelleSemaineRabets()
+        tabprofit=np.append(tabprofit,monStock.profit())
+    print(tabprofit)
+
+#profitRabet()
