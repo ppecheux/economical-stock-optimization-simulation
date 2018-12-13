@@ -217,18 +217,18 @@ class Stock:
 
 
 
-nbSemPermenption = 2
+nbSemPermenption = 4
 ListeSemainesDeStock = np.zeros(nbSemPermenption)
 
 
 def tabProduitMoinsDemande(tab,demande):
     for i in range (len(tab)):
-        if tab[len(tab)-1-i]>demande:
-            tab[len(tab)-1-i]-=demande
+        if tab[-1-i]>demande:
+            tab[-1-i]-=demande
             demande=0
         else:
-            demande-=tab[len(tab)-1-i]
-            tab[len(tab)-1-i]=0
+            demande-=tab[-1-i]
+            tab[-1-i]=0
 
     return tab,demande
 
@@ -244,7 +244,7 @@ def testChangementSemaine():
         monStock.nouvelleSemaineRabaiss()
         #monStock.printStock()
 
-testChangementSemaine()
+#testChangementSemaine()
 
 def simulerSemainesStockCible(nbSemaines,stockCible,demandes):
     ListeSemainesDeStock[0]=stockCible
@@ -289,30 +289,39 @@ def profitTabStockCible(nbSemaines,tabStockCible,mesDemandes):
 
 def simulationPousse():
 
-    tabStockCible=np.arange(284,287,1)
+    tabStockCible=np.arange(0,287,10)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-    nbsemaine=30000
+    nbsemaine=1000
     mesDemandes = np.zeros(nbsemaine)#np.random.normal(mu, sigma, nbsemaine)
     #mesDemandes[mesDemandes<0]=0
 
-    tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
-    #dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
-    profits = profitTabStockCible(nbsemaine,tabStockCible,mesDemandes)
+    #pour visualiser le service cible
+    # tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
+    # plt.plot(tabStockCible,tabServiceSimule,'co',label='taux de ServiceCible')
+    # plt.ylabel("Service Reel Simule")
+    # plt.show()
 
-    plt.ylabel("Service Reel Simule")
+    #pour les déchets
+    dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
+    plt.plot(tabStockCible,dechets,'k',label='taux de Déchet')
+    plt.ylabel("taux de déchet")
+
+    #profits = profitTabStockCible(nbsemaine,tabStockCible,mesDemandes)
+    #plt.plot(tabStockCible,profits/np.amax(profits),'yo',label='taux de profit')
+  
+ 
     plt.xlabel("Stock Cible")
-    plt.plot(tabStockCible,tabServiceSimule,'co',label='taux de ServiceCible')
 
-    #plt.plot(tabStockCible,dechets,'k',label='taux de Déchet')
+    #plt.show() 
     #print(tabServiceSimule)
     #print(dechets)
     plt.show()
 
-    #plt.plot(tabStockCible,profits/np.amax(profits),'yo',label='taux de profit')
-    #plt.show()
+    
 
-#simulationPousse()
+
+simulationPousse()
 
 def simulationFacile():
     tabStockCible=np.arange(0,10,1)

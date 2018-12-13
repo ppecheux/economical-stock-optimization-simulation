@@ -19,7 +19,7 @@ def testdecalCaseTab():
     print(tab)
     print(decalCaseTab(tab))
 
-testdecalCaseTab()
+#testdecalCaseTab()
 
 def tabProduitMoinsDemande(tab,demande):
     for i in range (len(tab)):
