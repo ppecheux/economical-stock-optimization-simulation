@@ -50,10 +50,9 @@ def tabApresRabaisDemandeRestante(tabStock,demande):
 
     return tabStock,demande
 
-def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit=97,dRabais=0,aDrabais=0):
+def tabProduitMoinsDemandeRabet(tabStock,prixInit=97,dRabais=0,aDrabais=0):
     #on veut simuler l'achat des articles selon leur prix dans le tableau
     stockIniDernier=tabStock[-1]
-    caDernier=0
     nbVendu=0
 
     #if dRabais>0:#le gens vont commencer à acheter plus 
@@ -66,9 +65,8 @@ def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit=97,dRabais=0,aDr
     tabStock,demande=tabApresRabaisDemandeRestante(tabStock,demande)
 
     nbVendu=stockIniDernier-tabStock[-1]
-    caDernier=prixDernier*nbVendu
     if demande == 0:
-        return tabStock,demande,caDernier
+        return tabStock,demande
 
     
     if len(tabStock)>2 and aDrabais>0:#le gens vont commencer à acheter plus 
@@ -84,7 +82,7 @@ def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit=97,dRabais=0,aDr
             nbVendu+=stockIniADernier-tabStock[-2]
 
             if demande == 0:
-                return tabStock,demande,caDernier
+                return tabStock,demande
     
     #finalement les autres semaines sont achetées
     if np.sum(tabStock)>0:
@@ -93,7 +91,7 @@ def tabProduitMoinsDemandeEtCADerniereSemaine(tabStock,prixInit=97,dRabais=0,aDr
         demande=max(0,demande)
         tabStock,demande = tabProduitMoinsDemande(tabStock,demande)
 
-    return tabStock,demande,caDernier
+    return tabStock,demande
 
 class Stock:
     '''représente l'état du stock sur les semaines'''
@@ -186,9 +184,8 @@ class Stock:
         self.age+=1
         tempSemaines=np.zeros(len(self.semaines))
         tempSemaines[:]=self.semaines
-        self.semaines,demande,caDsem = tabProduitMoinsDemandeEtCADerniereSemaine(self.semaines,self.prixInit,self.dRabais,self.aDrabais)
+        self.semaines,demande= tabProduitMoinsDemandeRabet(self.semaines,self.prixInit,self.dRabais,self.aDrabais)
         self.volumeSemaine=self.volumeSemaine+(tempSemaines-self.semaines)
-        self.caDeLaDerniereSemaine+=caDsem
         if(demande>0):
             self.nbNonSatifait+=1
             self.produitNonLivre+=demande
