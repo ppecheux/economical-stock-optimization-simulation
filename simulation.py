@@ -114,8 +114,6 @@ class Stock:
         self.dRabais=dRabais#le pourcent de rabais sur le dernier produit
         self.aDrabais=aDrabais
 
-        self.caDeLaDerniereSemaine=0
-
     def chiffreAff(self):
         return (self.fournis-self.dechet)*self.prixInit
 
@@ -150,7 +148,7 @@ class Stock:
 
         #ON décale les semaines
         self.dechet+=self.semaines[len(self.semaines)-1]
-        decalCaseTab(self.semaines)
+        self.semaines[1:]=self.semaines[:-1]
         
         #On initialise la nouvelle semaine
         self.semaines[0]=0.0
@@ -173,7 +171,7 @@ class Stock:
 
         #ON décale les semaines
 
-        decalCaseTab(self.semaines)
+        self.semaines[1:]=self.semaines[:-1]
         
         #On initialise la nouvelle semaine
         self.semaines[0]=0.0
@@ -194,10 +192,10 @@ class Stock:
 
         #ON décale les semaines
 
-        decalCaseTab(self.semaines)
+        self.semaines[1:]=self.semaines[:-1]
         
         #On initialise la nouvelle semaine
-        self.semaines[0]=0.0
+        self.semaines[0]=0
         self.semaines[0]=1.0*(self.stockCible-self.stockTotal())
         self.fournis+=self.semaines[0]
 
@@ -207,7 +205,6 @@ class Stock:
         print("etatDuStock=",self.semaines)
         print("vendus cumulé semaine stock=",self.volumeSemaine)
         print("ca cumulé semaine stock=",self.tabSemaineCA())
-        print("ca cumulé de la dernièreSS=",self.caDeLaDerniereSemaine)
         print("stockFournis=",self.fournis)
         print("stockDechet=",self.dechet)
         print("tauxDechet=",self.tauxDechet())
@@ -223,13 +220,6 @@ class Stock:
 nbSemPermenption = 2
 ListeSemainesDeStock = np.zeros(nbSemPermenption)
 
-
-
-def decalCaseTab(tab):
-    #retoune le tableau avec les valeurs décallées mais avec la premiere case <- derniere nouvelle case
-    for i in range (len(tab)):
-        tab[len(tab)-1-i]=tab[len(tab)-2-i]
-    return tab
 
 def tabProduitMoinsDemande(tab,demande):
     for i in range (len(tab)):

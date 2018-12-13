@@ -7,9 +7,19 @@ sigma=1
 
 def decalCaseTab(tab):
     #retoune le tableau avec les valeurs décallées mais avec la premiere case <- derniere nouvelle case
-    for i in range (len(tab)):
-        tab[len(tab)-1-i]=tab[len(tab)-2-i]
+    '''for i in range (len(tab)):
+        tab[len(tab)-1-i]=tab[len(tab)-2-i]'''
+
+    tab[1:]=tab[:-1]
+    tab[0]=0
     return tab
+
+def testdecalCaseTab():
+    tab=np.arange(1,6,1)
+    print(tab)
+    print(decalCaseTab(tab))
+
+testdecalCaseTab()
 
 def tabProduitMoinsDemande(tab,demande):
     for i in range (len(tab)):
