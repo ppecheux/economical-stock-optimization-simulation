@@ -124,6 +124,13 @@ class Stock:
     def profit(self):
         return (self.fournis-self.dechet)*self.prixInit-self.fournis*97
 
+    def tabSemaineCA(self):
+        temp= np.zeros(len(self.semaines))
+        temp[:2]= self.volumeSemaine[:2]*self.prixInit
+        temp[-2]=self.volumeSemaine[-2]*(self.prixInit*(1-self.aDrabet))
+        temp[-1]=self.volumeSemaine[-1]*(self.prixInit*(1-self.dRabet))
+        return temp
+
     def stockTotal(self):
         return np.sum(self.semaines)
 
@@ -197,6 +204,7 @@ class Stock:
         print("stockTotal=",self.stockTotal())
         print("etatDuStock=",self.semaines)
         print("vendus cumulé semaine stock=",self.volumeSemaine)
+        print("ca cumulé semaine stock=",self.tabSemaineCA())
         print("stockFournis=",self.fournis)
         print("stockDechet=",self.dechet)
         print("tauxDechet=",self.tauxDechet())
