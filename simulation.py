@@ -20,10 +20,15 @@ on a calculé que Prix=17719*volume**-0.579
 prix variable
 
 dp/p / dp/v
+
+pour 4 semaines on a 
+95% de sc pour 245 de stock cible
+99% de sc pour 286 de stock cible
 """
 import numpy as np
 import matplotlib.pyplot as plt
 import GestionDeTab as gt
+from mpl_toolkits.mplot3d import Axes3D
 sigma=60
 
 def prixToDemandeMoyenne(prix):
@@ -96,7 +101,7 @@ def tabProduitMoinsDemandeRabet(tabStock,prixInit=97,dRabais=0,aDrabais=0):
 class Stock:
     '''représente l'état du stock sur les semaines'''
 
-    def __init__(self,serviceCible,stockCible,ListeSemainesDeStock,prixInit=100,dRabais=0,aDrabais=0):
+    def __init__(self,stockCible,ListeSemainesDeStock,prixInit=100,dRabais=0,aDrabais=0):
         self.semaines=ListeSemainesDeStock#liste de stock
         self.dechet=0.0#on aurait pu mettre comme une semaine suplémentaire...
         self.volumeSemaine=np.zeros(len(ListeSemainesDeStock))#fait le cumul des produit vendu par semaine dans le stock
@@ -236,7 +241,7 @@ def testChangementSemaine():
     stockCible = 600
     demande=0
     ListeSemainesDeStock = np.array([100,0,0])
-    monStock=Stock(1,stockCible,ListeSemainesDeStock)
+    monStock=Stock(stockCible,ListeSemainesDeStock)
     for i in np.zeros(10):
         monStock.printStock()
         #monStock.nouvelleSemaine(demande)
@@ -248,7 +253,7 @@ def testChangementSemaine():
 
 def simulerSemainesStockCible(nbSemaines,stockCible,demandes):
     ListeSemainesDeStock[0]=stockCible
-    monStock=Stock(1,stockCible,ListeSemainesDeStock)
+    monStock=Stock(stockCible,ListeSemainesDeStock)
 
     for i in demandes:
         monStock.nouvelleSemaineRabaiss()
@@ -259,7 +264,7 @@ def simulerSemainesStockCible(nbSemaines,stockCible,demandes):
 
 def dechetsSemainesStockCible(nbSemaines,stockCible,demandes):
     ListeSemainesDeStock[0]=stockCible
-    monStock=Stock(1,stockCible,ListeSemainesDeStock)
+    monStock=Stock(stockCible,ListeSemainesDeStock)
 
     for i in demandes:
         monStock.nouvelleSemainePrix()
@@ -280,7 +285,7 @@ def dechetTabStockCible(nbSemaines,tabStockCible,mesDemandes):
 def profitTabStockCible(nbSemaines,tabStockCible,mesDemandes):
     tabProfit=[]
     for s in tabStockCible:
-        monStock=Stock(1,s,ListeSemainesDeStock)
+        monStock=Stock(s,ListeSemainesDeStock)
         for i in mesDemandes:
             monStock.nouvelleSemainePrix()
         tabProfit.append(monStock.profit())
@@ -292,7 +297,7 @@ def simulationPousse():
     tabStockCible=np.arange(0,287,10)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
-    nbsemaine=1000
+    nbsemaine=10000
     mesDemandes = np.zeros(nbsemaine)#np.random.normal(mu, sigma, nbsemaine)
     #mesDemandes[mesDemandes<0]=0
 
@@ -321,7 +326,7 @@ def simulationPousse():
     
 
 
-simulationPousse()
+#simulationPousse()
 
 def simulationFacile():
     tabStockCible=np.arange(0,10,1)
@@ -361,7 +366,7 @@ def distributionTauxDechet(stockCible):
 
 def tauxCAD(stockCible=245,ADrabais=0,Drabais=0,nbSemaine=100,nbSemPermenption=4):
     stockIni=np.zeros(nbSemPermenption)
-    monStock=Stock(1,stockCible,stockIni,dRabais=Drabais)
+    monStock=Stock(stockCible,stockIni,dRabais=Drabais)
     for s in range(nbSemaine):
         monStock.nouvelleSemaineRabaiss()
     return monStock.caDeLaDerniereSemaine/monStock.chiffreAff()
@@ -402,7 +407,7 @@ def profitRabais(stockCible=300,ADrabais=0,Drabais=0,nbSemaine=100000,nbSemPerme
     #tabDrabais=np.arange(0,1,0.1)
     tabDrabais=np.arange(0,0.02,0.002)
     for r in tabDrabais:
-        monStock=Stock(1,stockCible,semaineStock,dRabais=r)
+        monStock=Stock(stockCible,semaineStock,dRabais=r)
         for s in range(nbSemaine):
             monStock.nouvelleSemaineRabaiss()
         tabprofit=np.append(tabprofit,monStock.profit())
@@ -419,3 +424,47 @@ def profitRabais(stockCible=300,ADrabais=0,Drabais=0,nbSemaine=100000,nbSemPerme
     print(tabprofit)
 
 #profitRabais()
+
+def dechetsSemaines(nbSemaineSimulation=1000):
+#OBJECTIF montrer l'evolution des déchets en fonction du
+#nombre de semaine de peremption et du stock cible
+    minSC,maxSC,pas=100,500,10
+    stockCible=np.arange(minSC,maxSC,pas)
+
+    minp,maxp,pasp=2,5,1
+    peremption=np.arange(minp,maxp,pasp)
+    dechets=np.empty([len(peremption),len(stockCible)])
+
+    for p in peremption:
+        stockInit=np.zeros(p)
+        for sc in stockCible:
+            monStock=Stock(sc,stockInit)
+            for s in range(nbSemaineSimulation):
+                monStock.nouvelleSemaineRabaiss()
+            dechets[(p-minp)//pasp,(sc-minSC)//pas]=monStock.tauxDechet()
+
+    '''plotting to image
+    plt.imshow(dechets)
+    plt.show()'''
+
+    '''plotting to plot
+    hf = plt.figure()
+    ha = hf.add_subplot(111, projection='3d')
+    x=peremption
+    y=stockCible
+    X, Y = np.meshgrid(np.array(x,y),np.array(y,x) )  # `plot_surface` expects `x` and `y` data to be 2D
+    ha.plot_surface(X, Y, dechets)
+
+    plt.show()'''
+
+    for p in peremption:
+        plt.plot(stockCible,dechets[p-minp])
+    plt.show()
+
+    return dechets
+
+dechetsSemaines()
+    
+
+
+
