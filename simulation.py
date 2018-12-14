@@ -28,6 +28,7 @@ pour 4 semaines on a
 import numpy as np
 import matplotlib.pyplot as plt
 import GestionDeTab as gt
+from math import *
 from mpl_toolkits.mplot3d import Axes3D
 sigma=60
 
@@ -76,7 +77,7 @@ def tabProduitMoinsDemandeRabet(tabStock,prixInit=97,dRabais=0,aDrabais=0):
         #tant qu'il y a des produits moins chers
     prixDernier=prixInit*(1-dRabais)
 
-    demande = np.random.normal(prixToDemandeMoyenne(prixDernier),sigma)
+    demande = ceil(np.random.normal(prixToDemandeMoyenne(prixDernier),sigma))
     demande=max(0,demande)
 
     tabStock,demande=tabApresRabaisDemandeRestante(tabStock,demande)
@@ -90,7 +91,7 @@ def tabProduitMoinsDemandeRabet(tabStock,prixInit=97,dRabais=0,aDrabais=0):
         #tant qu'il y a des produits moins chers
         prixADernier=prixInit*(1-aDrabais)
         #on genere la demande en retirant la demande satisfaite par le premier stock
-        demande = np.random.normal(prixToDemandeMoyenne(prixADernier),sigma)-nbVendu
+        demande = ceil(np.random.normal(prixToDemandeMoyenne(prixADernier),sigma))-nbVendu
         demande=max(0,demande)
         if demande>0:
             stockIniADernier=tabStock[-2]
@@ -104,18 +105,18 @@ def tabProduitMoinsDemandeRabet(tabStock,prixInit=97,dRabais=0,aDrabais=0):
     #finalement les autres semaines sont achetées
     if np.sum(tabStock)>0:
         #print("nbvendu=",nbVendu)
-        demande=np.random.normal(prixToDemandeMoyenne(prixInit),sigma)-nbVendu
+        demande=ceil(np.random.normal(prixToDemandeMoyenne(prixInit),sigma))-nbVendu
         demande=max(0,demande)
         tabStock,demande = tabProduitMoinsDemande(tabStock,demande)
 
     return tabStock,demande
 
 def testtabProduitMoinsDemandeRabet():
-    tab=[100,100,0,0]
+    tab=[100,100,0,100,0,100]
     tab,demande=tabProduitMoinsDemandeRabet(tab)
     print(tab,demande)
 
-#testtabProduitMoinsDemandeRabet()
+testtabProduitMoinsDemandeRabet()
 
 
 class Stock:
@@ -139,15 +140,11 @@ class Stock:
         self.dRabais=dRabais#le pourcent de rabais sur le dernier produit
         self.aDrabais=aDrabais
 
-    def chiffreAff(self):
-        return (self.fournis-self.dechet)*self.prixInit
 
     def profit(self):
-        #renvoi le tableau des profits des semaines
-        prix=np.ones(len(self.semaines))
-        prix[-1]*=(1-self.dRabais)
-        prix[-2]*=(1-self.aDrabais)
-        return np.sum(self.tabSemaineCA()*prix)-(self.fournis*97)
+    #renvoi le profit réalisé par les produits du stock
+        print(np.sum(self.tabSemaineCA()))
+        return np.sum(self.tabSemaineCA())-(self.fournis*97)
 
     def tabSemaineCA(self):
         #renvoie le ca cumulé semaine stock
@@ -206,7 +203,7 @@ class Stock:
 
     def nouvelleSemaineRabaiss(self):
         self.age+=1
-        tempSemaines=np.zeros(len(self.semaines))
+        tempSemaines=np.empty_like(self.semaines)
         tempSemaines[:]=self.semaines
         self.semaines,demande= tabProduitMoinsDemandeRabet(self.semaines,self.prixInit,self.dRabais,self.aDrabais)
         self.volumeSemaine=self.volumeSemaine+(tempSemaines-self.semaines)
@@ -214,7 +211,7 @@ class Stock:
             self.nbNonSatifait+=1
             self.produitNonLivre+=demande
         else:
-            self.dechet+=self.semaines[len(self.semaines)-1]
+            self.dechet+=self.semaines[-1]
 
         #ON décale les semaines
 
@@ -250,9 +247,9 @@ ListeSemainesDeStock = np.zeros(nbSemPermenption)
 
 
 def testChangementSemaine():
-    stockCible = 600
+    stockCible = 1000
     demande=0
-    ListeSemainesDeStock = np.array([stockCible,0,0])
+    ListeSemainesDeStock = np.array([stockCible,0,0,0,0])
     monStock=Stock(stockCible,ListeSemainesDeStock)
     for i in np.zeros(10):
         monStock.printStock()
@@ -299,34 +296,35 @@ def profitTabStockCible(nbSemaines,tabStockCible,mesDemandes):
     for s in tabStockCible:
         monStock=Stock(s,ListeSemainesDeStock)
         for i in mesDemandes:
-            monStock.nouvelleSemainePrix()
+            monStock.nouvelleSemaineRabaiss()
         tabProfit.append(monStock.profit())
     
     return tabProfit
 
 def simulationPousse():
 
-    tabStockCible=np.arange(0,287,10)
+    tabStockCible=np.arange(0,500,30)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
     nbsemaine=10000
     mesDemandes = np.zeros(nbsemaine)#np.random.normal(mu, sigma, nbsemaine)
     #mesDemandes[mesDemandes<0]=0
 
-    #pour visualiser le service cible
+    '''#pour visualiser le service cible'''
     # tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
     # plt.plot(tabStockCible,tabServiceSimule,'co',label='taux de ServiceCible')
     # plt.ylabel("Service Reel Simule")
     # plt.show()
 
-    #pour les déchets
-    dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
-    plt.plot(tabStockCible,dechets,'k',label='taux de Déchet')
-    plt.ylabel("taux de déchet")
+    '''#pour les déchets'''
+    # dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
+    # plt.plot(tabStockCible,dechets,'k',label='taux de Déchet')
+    # plt.ylabel("taux de déchet")
 
-    #profits = profitTabStockCible(nbsemaine,tabStockCible,mesDemandes)
-    #plt.plot(tabStockCible,profits/np.amax(profits),'yo',label='taux de profit')
-  
+    '''#pour le profit'''
+    profits = profitTabStockCible(nbsemaine,tabStockCible,mesDemandes)
+    plt.plot(tabStockCible,profits,'yo',label='taux de profit')
+    plt.ylabel("profit") 
  
     plt.xlabel("Stock Cible")
 
@@ -336,8 +334,6 @@ def simulationPousse():
     plt.show()
 
     
-
-
 #simulationPousse()
 
 def simulationFacile():
@@ -480,25 +476,29 @@ def dechetsSemaines(nbSemaineSimulation=3000):
 def profitsSemaines(nbSemaineSimulation=2000):
 #OBJECTIF montrer l'evolution des profits en fonction du
 #nombre de semaine de peremption et du stock cible
-    minSC,maxSC,pas=0,500,30
+    minSC,maxSC,pas=0,300,70
     stockCible=np.arange(minSC,maxSC,pas)
 
-    minp,maxp,pasp=2,10,1
+    minp,maxp,pasp=3,8,1
     peremption=np.arange(minp,maxp,pasp)
-    profit=np.empty([len(peremption),len(stockCible)])
+    profit=np.zeros([len(peremption),len(stockCible)])
+    profitR=np.zeros([len(peremption),len(stockCible)])
 
     for p in peremption:
         stockInit=np.zeros(p)
         for sc in stockCible:
             monStock=Stock(sc,stockInit)
+            monSRabet=Stock(sc,stockInit,dRabais=0.1)
             for s in range(nbSemaineSimulation):
                 monStock.nouvelleSemaineRabaiss()
+                monSRabet.nouvelleSemaineRabaiss()
             profit[(p-minp)//pasp,(sc-minSC)//pas]=monStock.profit()
-
+            profitR[(p-minp)//pasp,(sc-minSC)//pas]=monSRabet.profit()
+        print(p)
     for p in peremption:
         #mettre les valeurs négaties à zero avec .clip
-        plt.plot(stockCible,profit[p-minp].clip(min=0))
-
+        plt.plot(stockCible,profit[p-minp].clip(min=0),color=('#0005'+str(p)+'0'))
+        plt.plot(stockCible,profitR[p-minp].clip(min=0),color=('#8989'+str(p)+'0'))
     plt.ylabel("Profit en € pour des valeurs positives sinon 0")
     plt.xlabel("Stock Cible")
     plt.show()
