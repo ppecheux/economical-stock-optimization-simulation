@@ -55,6 +55,18 @@ def tabApresRabaisDemandeRestante(tabStock,demande):
 
     return tabStock,demande
 
+def tabProduitMoinsDemande(tab,demande):
+    for i in range (len(tab)):
+        if tab[-1-i]>demande:
+            tab[-1-i]-=demande
+            demande=0
+        else:
+            demande-=tab[-1-i]
+            tab[-1-i]=0
+
+    return tab,demande
+
+
 def tabProduitMoinsDemandeRabet(tabStock,prixInit=97,dRabais=0,aDrabais=0):
     #on veut simuler l'achat des articles selon leur prix dans le tableau
     stockIniDernier=tabStock[-1]
@@ -98,6 +110,14 @@ def tabProduitMoinsDemandeRabet(tabStock,prixInit=97,dRabais=0,aDrabais=0):
 
     return tabStock,demande
 
+def testtabProduitMoinsDemandeRabet():
+    tab=[100,100,0,0]
+    tab,demande=tabProduitMoinsDemandeRabet(tab)
+    print(tab,demande)
+
+#testtabProduitMoinsDemandeRabet()
+
+
 class Stock:
     '''représente l'état du stock sur les semaines'''
 
@@ -140,6 +160,8 @@ class Stock:
     def stockTotal(self):
         return np.sum(self.semaines)
 
+
+    #fonctions de passage à une nouvelle semaine
     def nouvelleSemaine(self,demande):
         #On cherche à répondre à la demande
         #On considère qu'on doit livrer qu'un seul client
@@ -160,7 +182,6 @@ class Stock:
         self.semaines[0]=1.0*(self.stockCible-self.stockTotal())
         self.fournis+=self.semaines[0]
     
-
     def nouvelleSemainePrix(self):
         self.age+=1
 
@@ -206,11 +227,11 @@ class Stock:
 
     def printStock(self):
         print("age=",self.age)
-        print("stockTotal=",self.stockTotal())
+        # print("stockTotal=",self.stockTotal())
         print("etatDuStock=",self.semaines)
-        print("vendus cumulé semaine stock=",self.volumeSemaine)
-        print("ca cumulé semaine stock=",self.tabSemaineCA())
-        print("stockFournis=",self.fournis)
+        # print("vendus cumulé semaine stock=",self.volumeSemaine)
+        # print("ca cumulé semaine stock=",self.tabSemaineCA())
+        # print("stockFournis=",self.fournis)
         print("stockDechet=",self.dechet)
         print("tauxDechet=",self.tauxDechet())
         print("PersonnesNOnsatisfaites=",self.nbNonSatifait)
@@ -226,21 +247,12 @@ nbSemPermenption = 4
 ListeSemainesDeStock = np.zeros(nbSemPermenption)
 
 
-def tabProduitMoinsDemande(tab,demande):
-    for i in range (len(tab)):
-        if tab[-1-i]>demande:
-            tab[-1-i]-=demande
-            demande=0
-        else:
-            demande-=tab[-1-i]
-            tab[-1-i]=0
 
-    return tab,demande
 
 def testChangementSemaine():
     stockCible = 600
     demande=0
-    ListeSemainesDeStock = np.array([100,0,0])
+    ListeSemainesDeStock = np.array([stockCible,0,0])
     monStock=Stock(stockCible,ListeSemainesDeStock)
     for i in np.zeros(10):
         monStock.printStock()
@@ -401,7 +413,7 @@ def tauxCADperemptionRabais(pas=0):
 #tauxCADperemptionRabais(pas=0.2)
 
 def profitRabais(stockCible=300,ADrabais=0,Drabais=0,nbSemaine=100000,nbSemPermenption=4):
-    #fonction qui montre l'évolution du profit lors de la variation du rabet sur al dernière semaine
+#fonction qui montre l'évolution du profit lors de la variation du rabet sur al dernière semaine
     semaineStock=np.zeros(nbSemPermenption)
     tabprofit=np.array([])
     #tabDrabais=np.arange(0,1,0.1)
@@ -425,10 +437,10 @@ def profitRabais(stockCible=300,ADrabais=0,Drabais=0,nbSemaine=100000,nbSemPerme
 
 #profitRabais()
 
-def dechetsSemaines(nbSemaineSimulation=1000):
+def dechetsSemaines(nbSemaineSimulation=3000):
 #OBJECTIF montrer l'evolution des déchets en fonction du
 #nombre de semaine de peremption et du stock cible
-    minSC,maxSC,pas=100,500,10
+    minSC,maxSC,pas=100,300,10
     stockCible=np.arange(minSC,maxSC,pas)
 
     minp,maxp,pasp=2,5,1
@@ -463,8 +475,35 @@ def dechetsSemaines(nbSemaineSimulation=1000):
 
     return dechets
 
-dechetsSemaines()
+#dechetsSemaines()
     
+def profitsSemaines(nbSemaineSimulation=2000):
+#OBJECTIF montrer l'evolution des profits en fonction du
+#nombre de semaine de peremption et du stock cible
+    minSC,maxSC,pas=0,500,30
+    stockCible=np.arange(minSC,maxSC,pas)
 
+    minp,maxp,pasp=2,10,1
+    peremption=np.arange(minp,maxp,pasp)
+    profit=np.empty([len(peremption),len(stockCible)])
 
+    for p in peremption:
+        stockInit=np.zeros(p)
+        for sc in stockCible:
+            monStock=Stock(sc,stockInit)
+            for s in range(nbSemaineSimulation):
+                monStock.nouvelleSemaineRabaiss()
+            profit[(p-minp)//pasp,(sc-minSC)//pas]=monStock.profit()
+
+    for p in peremption:
+        #mettre les valeurs négaties à zero avec .clip
+        plt.plot(stockCible,profit[p-minp].clip(min=0))
+
+    plt.ylabel("Profit en € pour des valeurs positives sinon 0")
+    plt.xlabel("Stock Cible")
+    plt.show()
+
+    return profit
+
+profitsSemaines()
 
