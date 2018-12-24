@@ -37,7 +37,9 @@ def prixToDemandeMoyenne(prix):
     #a=17719
     #p=-0.579
     if prix>0 :
-        volume=(float(prix)/17719)**(-1/0.579)#on a le volume par an
+        #volume=(float(prix)/17719)**(-1/0.579)#on a le volume par an
+        #volume=(prix/17719)**(-1.727) #aller plus vite?
+        volume=-1.727*(100/17719)**(-1.727-1)*(prix-100) + (100/17719)**(-1.727) #linéariser    
     else:
         volume=1
     #donc on divise par 52 pour l'avoir en semaine
@@ -61,6 +63,7 @@ def tabProduitMoinsDemande(tab,demande):
         if tab[-1-i]>demande:
             tab[-1-i]-=demande
             demande=0
+            break
         else:
             demande-=tab[-1-i]
             tab[-1-i]=0
@@ -116,7 +119,7 @@ def testtabProduitMoinsDemandeRabet():
     tab,demande=tabProduitMoinsDemandeRabet(tab)
     print(tab,demande)
 
-testtabProduitMoinsDemandeRabet()
+#testtabProduitMoinsDemandeRabet()
 
 
 class Stock:
@@ -304,7 +307,7 @@ def profitTabStockCible(nbSemaines,tabStockCible,mesDemandes):
 
 def simulationPousse():
 
-    tabStockCible=np.arange(0,500,30)
+    tabStockCible=np.arange(0,500,50)
     mu, sigma = 155, 60 # demande moyenne et equart type de la demande moyenne
 
     nbsemaine=10000
@@ -312,26 +315,27 @@ def simulationPousse():
     #mesDemandes[mesDemandes<0]=0
 
     '''#pour visualiser le service cible'''
-    # tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
-    # plt.plot(tabStockCible,tabServiceSimule,'co',label='taux de ServiceCible')
+    tabServiceSimule =simulerTabStockCible(nbsemaine,tabStockCible,mesDemandes)
+    plt.plot(tabStockCible,tabServiceSimule,'c',label='taux de ServiceCible')
     # plt.ylabel("Service Reel Simule")
     # plt.show()
 
     '''#pour les déchets'''
-    # dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
-    # plt.plot(tabStockCible,dechets,'k',label='taux de Déchet')
+    dechets = dechetTabStockCible(nbsemaine,tabStockCible,mesDemandes)
+    plt.plot(tabStockCible,dechets,'k',label='taux de Déchet')
     # plt.ylabel("taux de déchet")
 
     '''#pour le profit'''
     profits = profitTabStockCible(nbsemaine,tabStockCible,mesDemandes)
-    plt.plot(tabStockCible,profits,'yo',label='taux de profit')
-    plt.ylabel("profit") 
+    plt.plot(tabStockCible,profits/np.amax(profits),'y',label='taux de profit')
+    plt.ylabel("taux") 
  
     plt.xlabel("Stock Cible")
 
     #plt.show() 
     #print(tabServiceSimule)
     #print(dechets)
+    plt.legend()
     plt.show()
 
     
@@ -409,12 +413,12 @@ def tauxCADperemptionRabais(pas=0):
 
 #tauxCADperemptionRabais(pas=0.2)
 
-def profitRabais(stockCible=300,ADrabais=0,Drabais=0,nbSemaine=100000,nbSemPermenption=4):
-#fonction qui montre l'évolution du profit lors de la variation du rabet sur al dernière semaine
+def profitRabais(stockCible=245,ADrabais=0,Drabais=0,nbSemaine=1000,nbSemPermenption=3):
+#fonction qui montre l'évolution du profit lors de la variation du rabet sur la dernière semaine
     semaineStock=np.zeros(nbSemPermenption)
     tabprofit=np.array([])
     #tabDrabais=np.arange(0,1,0.1)
-    tabDrabais=np.arange(0,0.02,0.002)
+    tabDrabais=np.arange(0,0.1,0.005)
     for r in tabDrabais:
         monStock=Stock(stockCible,semaineStock,dRabais=r)
         for s in range(nbSemaine):
@@ -432,12 +436,12 @@ def profitRabais(stockCible=300,ADrabais=0,Drabais=0,nbSemaine=100000,nbSemPerme
 
     print(tabprofit)
 
-#profitRabais()
+profitRabais()
 
 def dechetsSemaines(nbSemaineSimulation=3000):
 #OBJECTIF montrer l'evolution des déchets en fonction du
 #nombre de semaine de peremption et du stock cible
-    minSC,maxSC,pas=100,300,10
+    minSC,maxSC,pas=150,300,10
     stockCible=np.arange(minSC,maxSC,pas)
 
     minp,maxp,pasp=2,5,1
@@ -467,7 +471,10 @@ def dechetsSemaines(nbSemaineSimulation=3000):
     plt.show()'''
 
     for p in peremption:
-        plt.plot(stockCible,dechets[p-minp])
+        plt.plot(stockCible,dechets[p-minp],label= str(p) +" semaines")
+    plt.ylabel("part de déchet")
+    plt.xlabel("Stock Cible")
+    plt.legend()
     plt.show()
 
     return dechets
@@ -480,7 +487,7 @@ def profitsSemaines(nbSemaineSimulation=1000):
     minSC,maxSC,pas=0,300,40
     stockCible=np.arange(minSC,maxSC,pas)
 
-    minp,maxp,pasp=2,5,1
+    minp,maxp,pasp=2,5,1 #ce sont la longueur des stocks
     peremption=np.arange(minp,maxp,pasp)
     profit=np.zeros([len(peremption),len(stockCible)])
     profitR=np.zeros([len(peremption),len(stockCible)])
@@ -499,12 +506,13 @@ def profitsSemaines(nbSemaineSimulation=1000):
     for p in peremption:
         #mettre les valeurs négaties à zero avec .clip
         #plt.plot(stockCible,profit[p-minp].clip(min=0),color=('#0005'+str(p)+'0'))
-        plt.plot(stockCible,profitR[p-minp].clip(min=0),color=('#8989'+str(p)+'0'))
+        plt.plot(stockCible,profitR[p-minp].clip(min=0),label= str(p) +" semaines")
     plt.ylabel("Profit en € pour des valeurs positives sinon 0")
     plt.xlabel("Stock Cible")
+    plt.legend()
     plt.show()
 
     return profit
 
-profitsSemaines()
+#profitsSemaines()
 
