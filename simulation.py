@@ -38,8 +38,8 @@ def prixToDemandeMoyenne(prix):
     #p=-0.579
     if prix>0 :
         #volume=(float(prix)/17719)**(-1/0.579)#on a le volume par an
-        #volume=(prix/17719)**(-1.727) #aller plus vite?
-        volume=-1.727*(100/17719)**(-1.727-1)*(prix-100) + (100/17719)**(-1.727) #linéariser    
+        volume=(prix/17719)**(-1.727) #aller plus vite?
+        #volume=-1.727*(100/17719)**(-1.727-1)*(prix-100) + (100/17719)**(-1.727) #linéariser    
     else:
         volume=1
     #donc on divise par 52 pour l'avoir en semaine
@@ -110,7 +110,9 @@ def tabProduitMoinsDemandeRabet(tabStock,prixInit=97,dRabais=0,aDrabais=0):
         #print("nbvendu=",nbVendu)
         demande=ceil(np.random.normal(prixToDemandeMoyenne(prixInit),sigma))-nbVendu
         demande=max(0,demande)
-        tabStock,demande = tabProduitMoinsDemande(tabStock,demande)
+        if(demande>0):
+            tabStock,demande = tabProduitMoinsDemande(tabStock[:-2],demande)
+            tabStock=np.append(tabStock,[0,0])
 
     return tabStock,demande
 
@@ -413,12 +415,12 @@ def tauxCADperemptionRabais(pas=0):
 
 #tauxCADperemptionRabais(pas=0.2)
 
-def profitRabais(stockCible=245,ADrabais=0,Drabais=0,nbSemaine=1000,nbSemPermenption=3):
+def profitRabais(stockCible=245,ADrabais=0,Drabais=0,nbSemaine=10000,nbSemPermenption=3):
 #fonction qui montre l'évolution du profit lors de la variation du rabet sur la dernière semaine
     semaineStock=np.zeros(nbSemPermenption)
     tabprofit=np.array([])
     #tabDrabais=np.arange(0,1,0.1)
-    tabDrabais=np.arange(0,0.1,0.005)
+    tabDrabais=np.arange(-0.2,0.5,0.1)#domaine du rabais
     for r in tabDrabais:
         monStock=Stock(stockCible,semaineStock,dRabais=r)
         for s in range(nbSemaine):
@@ -436,22 +438,22 @@ def profitRabais(stockCible=245,ADrabais=0,Drabais=0,nbSemaine=1000,nbSemPermenp
 
     print(tabprofit)
 
-profitRabais()
+#profitRabais()
 
-def dechetsSemaines(nbSemaineSimulation=3000):
+def dechetsSemaines(nbSemaineSimulation=10000):
 #OBJECTIF montrer l'evolution des déchets en fonction du
 #nombre de semaine de peremption et du stock cible
-    minSC,maxSC,pas=150,300,10
+    minSC,maxSC,pas=300,1000,100
     stockCible=np.arange(minSC,maxSC,pas)
 
-    minp,maxp,pasp=2,5,1
+    minp,maxp,pasp=3,5,1
     peremption=np.arange(minp,maxp,pasp)
     dechets=np.empty([len(peremption),len(stockCible)])
 
     for p in peremption:
         stockInit=np.zeros(p)
         for sc in stockCible:
-            monStock=Stock(sc,stockInit)
+            monStock=Stock(sc,stockInit,dRabais=0.2)
             for s in range(nbSemaineSimulation):
                 monStock.nouvelleSemaineRabaiss()
             dechets[(p-minp)//pasp,(sc-minSC)//pas]=monStock.tauxDechet()
@@ -479,7 +481,7 @@ def dechetsSemaines(nbSemaineSimulation=3000):
 
     return dechets
 
-#dechetsSemaines()
+dechetsSemaines()
     
 def profitsSemaines(nbSemaineSimulation=1000):
 #OBJECTIF montrer l'evolution des profits en fonction du
