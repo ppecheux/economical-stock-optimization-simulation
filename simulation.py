@@ -120,25 +120,26 @@ testtabProduitMoinsDemandeRabet()
 
 
 class Stock:
-    '''représente l'état du stock sur les semaines'''
+#représente l'état du stock sur les semaines
 
     def __init__(self,stockCible,ListeSemainesDeStock,prixInit=100,dRabais=0,aDrabais=0):
-        self.semaines=ListeSemainesDeStock#liste de stock
-        self.dechet=0.0#on aurait pu mettre comme une semaine suplémentaire...
-        self.volumeSemaine=np.zeros(len(ListeSemainesDeStock))#fait le cumul des produit vendu par semaine dans le stock
+        self.semaines=ListeSemainesDeStock#liste des stocks qui vont évoluer de semaine en semaine
+        self.dechet=0.0
+        self.volumeSemaine=np.zeros(len(ListeSemainesDeStock))
+        #fait le cumul des produit vendu par semaine dans le stock
 
-        self.nbNonSatifait = 0.0
-        self.produitNonLivre=0.0
+        self.nbNonSatifait = 0.0#nombre cumulé des semaines ou la demande n'a pas ete satisfaite
+        self.produitNonLivre=0.0#nombre cumulé des demandes non satisfaites
         
-        self.fournis= stockCible
-        self.stockCible = float(stockCible)
+        self.fournis= stockCible #nombre de produits que l'on a acheté au fournisseur
+        self.stockCible = float(stockCible) #stock avant de répondre à la demande
 
-        self.prixInit = prixInit
-        self.mu=prixToDemandeMoyenne(self.prixInit)
-        self.age=0
+        self.prixInit = prixInit #prix du produit que l'on veut vendre avec la marge maximale
+        self.mu=prixToDemandeMoyenne(self.prixInit) #demande moyenne selon l'elasticité de nos produits
+        self.age=0 #nombre de changement de semaine
 
         self.dRabais=dRabais#le pourcent de rabais sur le dernier produit
-        self.aDrabais=aDrabais
+        self.aDrabais=aDrabais#le pourcentage de rabais pour l'avant derniere semaine
 
 
     def profit(self):
@@ -473,13 +474,13 @@ def dechetsSemaines(nbSemaineSimulation=3000):
 
 #dechetsSemaines()
     
-def profitsSemaines(nbSemaineSimulation=2000):
+def profitsSemaines(nbSemaineSimulation=1000):
 #OBJECTIF montrer l'evolution des profits en fonction du
 #nombre de semaine de peremption et du stock cible
-    minSC,maxSC,pas=0,300,70
+    minSC,maxSC,pas=0,300,40
     stockCible=np.arange(minSC,maxSC,pas)
 
-    minp,maxp,pasp=3,8,1
+    minp,maxp,pasp=2,5,1
     peremption=np.arange(minp,maxp,pasp)
     profit=np.zeros([len(peremption),len(stockCible)])
     profitR=np.zeros([len(peremption),len(stockCible)])
@@ -497,7 +498,7 @@ def profitsSemaines(nbSemaineSimulation=2000):
         print(p)
     for p in peremption:
         #mettre les valeurs négaties à zero avec .clip
-        plt.plot(stockCible,profit[p-minp].clip(min=0),color=('#0005'+str(p)+'0'))
+        #plt.plot(stockCible,profit[p-minp].clip(min=0),color=('#0005'+str(p)+'0'))
         plt.plot(stockCible,profitR[p-minp].clip(min=0),color=('#8989'+str(p)+'0'))
     plt.ylabel("Profit en € pour des valeurs positives sinon 0")
     plt.xlabel("Stock Cible")
