@@ -279,11 +279,12 @@ def simulerSemainesStockCible(nbSemaines,stockCible,demandes):
 
 def dechetsSemainesStockCible(nbSemaines,stockCible,demandes):
     ListeSemainesDeStock[0]=stockCible
-    monStock=Stock(stockCible,ListeSemainesDeStock)
+    monStock=Stock(stockCible,ListeSemainesDeStock,dRabais=0.2)
 
     for i in demandes:
-        monStock.nouvelleSemainePrix()
+        #monStock.nouvelleSemainePrix()
         #monStock.printStock()
+        monStock.nouvelleSemaineRabaiss()
 
     #print([tauxDechet,monStock.dechet,monStock.semaines[len(monStock.semaines)-1],monStock.fournis,monStock.stockTotal()])
     return monStock.tauxDechet()#semble trop faible
@@ -377,7 +378,7 @@ def distributionTauxDechet(stockCible):
     plt.hist(dechets)
     plt.show()
 
-#distributionTauxDechet(245)
+distributionTauxDechet(245)
 
 def tauxCAD(stockCible=245,ADrabais=0,Drabais=0,nbSemaine=100,nbSemPermenption=4):
     stockIni=np.zeros(nbSemPermenption)
@@ -438,7 +439,7 @@ def profitRabais(stockCible=245,ADrabais=0,Drabais=0,nbSemaine=10000,nbSemPermen
 
     #print(tabprofit)
 
-profitRabais()
+#profitRabais()
 
 def dechetsSemaines(nbSemaineSimulation=50000):
 #OBJECTIF montrer l'evolution des déchets en fonction du
@@ -557,4 +558,4 @@ def profitADRabais(stockCible=245,ADrabais=0,Drabais=0,nbSemaine=1000,nbSemPerme
     
 
     #print(tabprofit)
-profitADRabais()
+#profitADRabais()
