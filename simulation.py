@@ -481,7 +481,7 @@ def dechetsSemaines(nbSemaineSimulation=10000):
 
     return dechets
 
-dechetsSemaines()
+#dechetsSemaines()
     
 def profitsSemaines(nbSemaineSimulation=1000):
 #OBJECTIF montrer l'evolution des profits en fonction du
@@ -518,3 +518,19 @@ def profitsSemaines(nbSemaineSimulation=1000):
 
 #profitsSemaines()
 
+def histCADsemaines():
+    monStock=Stock(245,np.zeros(4),dRabais=0.2)
+    monStock2=Stock(245,np.zeros(4),dRabais=0)
+    for i in range(0,10000):
+        monStock.nouvelleSemaineRabaiss()
+        monStock2.nouvelleSemaineRabaiss()
+
+        #print(monStock.tabSemaineCA())
+    plt.plot(np.arange(len(monStock.tabSemaineCA())),monStock.tabSemaineCA()/np.amax(monStock.tabSemaineCA()),'co',label='avec 20% de rabet sur la dernière semaine')
+    plt.plot(np.arange(len(monStock.tabSemaineCA())),monStock2.tabSemaineCA()/np.amax(monStock2.tabSemaineCA()),'yo',label='sans rabais')
+    plt.xlabel("numéro de semaine")
+    plt.ylabel("Chiffre d'affaire de la semaine")
+    plt.legend()
+    plt.show()
+
+histCADsemaines()
