@@ -30,29 +30,29 @@ Voici les attributs de cette classe : cela vous permet d’avoir un aperçu
 des paramètres que nous allons mettre à jour à chaque nouvel appel de la
 méthode de changement de semaine.
 
-  ----------------------------------------------------------------------------------------------------------
-  class Stock:\
-  \#représente l'état du stock sur les semaines\
-  \
-      def \_\_init\_\_(self,stockCible,ListeSemainesDeStock,prixInit=100,dRabais=0,aDrabais=0):\
-         self.semaines=ListeSemainesDeStock\#liste des stocks qui vont évoluer de semaine en semaine\
-         self.dechet=0.0\
-         self.volumeSemaine=np.zeros(len(ListeSemainesDeStock))\
-         \#fait le cumul des produit vendu par semaine dans le stock\
-  \
-         self.nbNonSatifait = 0.0\#nombre cumulé des semaines ou la demande n'a pas ete satisfaite\
-         self.produitNonLivre=0.0\#nombre cumulé des demandes non satisfaites\
-       \
-         self.fournis= stockCible \#nombre de produits que l'on a acheté au fournisseur\
-         self.stockCible = float(stockCible) \#stock avant de répondre à la demande\
-  \
-         self.prixInit = prixInit \#prix du produit que l'on veut vendre avec la marge maximale\
-         self.mu=prixToDemandeMoyenne(self.prixInit) \#demande moyenne selon l'elasticité de nos produits\
-         self.age=0 \#nombre de changement de semaine\
-  \
-         self.dRabais=dRabais\#le pourcent de rabais sur le dernier produit\
-         self.aDrabais=aDrabais\#le pourcentage de rabais pour l'avant derniere semaine
-  ----------------------------------------------------------------------------------------------------------
+```python
+class Stock:
+    '''représente l'état du stock sur les semaines'''
+
+    def __init__(self,serviceCible,stockCible,ListeSemainesDeStock):
+        self.semaines=ListeSemainesDeStock#liste de stock
+        self.dechet=0.0#on aurait pu mettre comme une semaine suplémentaire...
+
+        self.nbNonSatifait = 0.0
+        self.produitNonLivre=0.0
+        
+        self.fournis= stockCible
+        self.stockCible = float(stockCible)
+
+        self.prixInit = 100
+        self.mu=prixToDemandeMoyenne(self.prixInit)
+        self.age=0
+
+        self.dernierRabet=0.2 #le pourcent de rabet sur le dernier produit
+        self.premierRabet=0.1
+
+        self.caDeLaDerniereSemaine=0
+```
 
 Service cible et Stock cible
 ----------------------------
@@ -196,18 +196,15 @@ qui va être vendu.
 Dans notre code on a une minuscule fonction pour convertir les prix en
 volume :
 
-  ------------------------------------------------------------------------------------------------------------------------------
-  def prixToDemandeMoyenne(prix):\
-      '''Prix=17719\*volume\*\*-0.579'''\
-      if prix&gt;0 :\
-           volume=(prix/17719)\*\*(-1.727) \#aller plus vite?\
-           \#volume=-1.727\*(100/17719)\*\*(-1.727-1)\*(prix-100) + (100/17719)\*\*(-1.727) \#tangente pour un prix à 100    \
-      else:\
-           volume=1\
-      \#donc on divise par 52 pour l'avoir en semaine\
-      return volume/52
-  ------------------------------------------------------------------------------------------------------------------------------
-  ------------------------------------------------------------------------------------------------------------------------------
+```python
+def prixToDemandeMoyenne(prix):
+    '''Prix=17719*volume**-0.579'''
+    a=17719
+    p=-0.579
+    volume=(prix/a)**(-1/0.579)#on a le volume par an
+    #donc on divise par 52 pour l'avoir en semaine
+    return volume/52
+```
 
 Recherche du dernier rabais optimal
 -----------------------------------
